@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>如何在Linux上部署SMB服务 | 某初雪的无名blog</title>
+<meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://yuki.yuki233.com/favicon.ico?v=1622186114721">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://yuki.yuki233.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://yuki.yuki233.com">某初雪的无名blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>如何在Linux上部署SMB服务</h1>
+            <p class="article-meta">
+              2019-05-01
+              
+            </p>
+            
+            <div class="post-content">
+              <h1 id="姑且算是前言">姑且算是前言？</h1>
+<p>众所周知。。。sftp传文件有点慢。。。ftp传文件有点麻烦。。。稍微折中一下。。。用smb传文件应该是不错的选择，就像局域网那样直接把服务器的某个目录映射到本地岂不美哉~<br>
+<del datetime="2018-11-20T12:01:13+00:00">//而且局域网里的nas直接用这个不是也挺好的嘛</del><br>
+但是咱最开始觉得windows配置SMB还比较简单。。。Linux的话。。。毕竟人家SMB好像是微软自家的东西。。。Linux上用起来多少还是得折腾下的。。。。但是事实证明比配置一个ftp服务端还省事。。。。</p>
+<h1 id="资源准备">资源准备</h1>
+<p>首先，假定你有一台运行着Debian 9的vps，且服务商和你的运营商都没有封闭所需的端口，其次知道下述操作可能不会对你的vps有效。最主要的是知道一些基础命令的用法。。。。。<br>
+所用软件：【<a href="https://www.samba.org/" target="_blank" rel="noopener">Samba</a>】（smb服务端）<br>
+推荐使用apt直接进行安装：<br>
+<code><span style="color: #ff0000;">#</span> apt update -y &amp;&amp; apt install samba* -y</code><br>
+至于编译什么的。。。让觉得编译很酷的人自己去编译好了。。。反正官网上面有。。。（某初雪向来是能apt绝对不动手编译的人quq）<br>
+然后就完成安装啦~~</p>
+<h1 id="进行配置">进行配置</h1>
+<p>配置的话，主要有两个部分，一个是配置共享目录，一个是配置用户，这里也分开讲好了</p>
+<h3 id="配置共享目录">配置共享目录</h3>
+<p>首先呢，samba的配置文件如果是apt安装的，那么默认会在<br>
+<code>/etc/samba/smb.conf</code><br>
+如果是编译出来的。。。自己去找配置文件吧(。。。咱也不知道。。。应该是你自己指定的位置。。。<br>
+首先先创建打算用来共享的文件夹，比如：<br>
+<code><span style="color: #ff0000;">#</span> mkdir -p /yuki/smb</code><br>
+然后给这个目录和它的父级目录授予读写权限（<span style="color: #ff0000;">请勿使用chmod 666，文件夹需要运行权限才能进去</span>）<br>
+比如<code><span style="color: #ff0000;">#</span> chmod 777 /yuki /yuki/smb</code><br>
+把配置文件备份下<br>
+<code><span style="color: #ff0000;">#</span> cp /etc/samba/smb.conf /etc/samba/_smb.con</code><br>
+使用你喜欢的编辑器比如nano来对配置文件进行编辑<br>
+<code><span style="color: #ff0000;">#</span> nano /etc/samba/smb.conf</code><br>
+然后我们会看到一大堆文本。。。。具体每一行都是什么意思咱就不详细的介绍了，这里我们直接转到最后一行然后添加这些内容<br>
+<code>[]    <span style="color: #006600;">##共享名称，使用英文。如yuki</span><br>
+comment =    <span style="color: #006600;">##随便写点什么注释，用英文。如 yuki smb</span><br>
+path =    <span style="color: #006600;">##到你要共享的文件夹的路径，如/yuki/smb 表示共享/yuki/smb目录，这里需要注意yuki和smb目录都需要有读写权，因此推荐直接配置这两个文件夹777权限</span><br>
+browseable = yes    <span style="color: #006600;">##可浏览</span><br>
+writable = yes    <span style="color: #006600;">##可写</span><br>
+guest ok = no    <span style="color: #006600;">##禁止匿名用户</span></code><br>
+绿色部分是注释，不要写进去，写进去的配置文件应该是长这个样子的<br>
+<a href="https://yuki.yuki233.com/wp-content/uploads/2018/11/コメント-2018-11-20-224118.jpg"><img class="size-full wp-image-153 alignnone" src="https://yuki.yuki233.com/wp-content/uploads/2018/11/コメント-2018-11-20-224118.jpg" alt="" width="223" height="129" /></a><br>
+然后按 Ctrl+X 然后输入 <span style="color: #0000ff;">Y</span> 和 <span style="color: #0000ff;">回车</span> 保存+退出（如果vim不是你的常用编辑器你还非用vim打开了的话，不要问咱怎么退出，老老实实用和咱一样用nano就好了）<br>
+然后重启一下smb服务器看看配置有没有报错，如果报错了请按照上面的步骤重新检查一下<br>
+<code><span style="color: #ff0000;">#</span> smbd restart</code>或者<br>
+//<del datetime="2018-11-20T12:01:13+00:00">不要听其他乱七八糟的blog不知道从哪里复制的<code><span style="color: #ff0000;">#</span> service smb restart</code></del><br>
+只要没报错就是配置ok了，不过要注意的是这里并不会判断共享目录的权限是否正常。</p>
+<h3 id="设置用户">设置用户</h3>
+<p>首先得在系统里创建一个用户（虽然直接使用你现在登陆的账户也不是不行。。。），总之首先从添加用户开始说好了。。。<br>
+<code><span style="color: #ff0000;">#</span> adduser [用户名]</code><br>
+然后根据提示输入对应的密码（可以额外操作一下禁止这个用户登陆控制台，不过这里不介绍这个操作）<br>
+然后使用<code><span style="color: #ff0000;">#</span> smbpasswd -a [用户名]</code>来把刚才创建的用户添加到smb的用户列表里并设置密码（事后如果要改密码也是这个命令）<br>
+保险起见，最后再尝试重启一下smb服务器确保各项设置都没问题<br>
+<code><span style="color: #ff0000;">#</span> smbd restart</code><br>
+没有提示就证明完成了</p>
+<h1 id="给windows映射一下">给Windows映射一下</h1>
+<p>这个过程比较简单，首先打开【计算机】或者叫做【我的电脑】什么的，你会看到这样的资源管理器界面<br>
+<img class="alignnone wp-image-154 size-full" src="https://yuki.yuki233.com/wp-content/uploads/2018/11/2018-11-20-235601.jpg" alt="" width="1077" height="617" /><br>
+然后按下左上角的<span style="color: #0000ff;">计算机</span>并点击<span style="color: #0000ff;">映射网络驱动器</span><br>
+<img class="alignnone size-full wp-image-155" src="https://yuki.yuki233.com/wp-content/uploads/2018/11/2018-11-21-000718.jpg" alt="" width="317" height="169" /><br>
+在新出来的窗口里填写这些东西：<br>
+<img class="alignnone size-full wp-image-156" src="https://yuki.yuki233.com/wp-content/uploads/2018/11/2018-11-21-001303.jpg" alt="" width="622" height="501" /><br>
+比如<code>\yuki233.com\smb</code>(各位就不用试图连接咱的了。。。这个地址没有用)，然后按照提示输入用户名和密码即可。如果连接不上去。。。可以参考一下下面那一小节。。。。</p>
+<h1 id="说在最后">说在最后</h1>
+<p>smb的话速度确实会快很多，不过由于种种原因并不一定能稳定的运行在互联网环境上，比如国内运营商对445端口的封闭之类的操作都会导致无法正常使用，此外，由于不像SSH/SFTP/FTP那样可以用证书或者密钥或者SSL对通信加密，因此安全性上也许也有待进一步考量，不过这些就不是本文需要考虑的部分啦，顺带一提，<span style="color: #ff0000;">由于按照本文进行操作产生的一切损失咱都一概不负责哦~</span></p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/Dguep2QKR/">
+                <h3 class="post-title">
+                  MikroTik Cloud Router Switch的配置
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+          
+            <div class="paper" data-aos="fade-in">
+              <div id="gitalk-container"></div>
+            </div>
+          
+
+          
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://yuki.yuki233.com/images/avatar.png?v=1622186114721" class="no-responsive avatar">
+    <div class="text-muted">在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/hatsuyuki280" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/yuki233dayo" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/8mIx_8uO5/">【迁移成功】本站已成功从WordPress顺利迁移到了Gridea！</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/VVlVUALjd/">本站迁移时遇到的诸多问题及对应的解决方案</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/LaGIS7D9T/">如何在Linux上部署SMB服务</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/Dguep2QKR/">MikroTik Cloud Router Switch的配置</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/about/">关于</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/PeEMlVzN2/">好开心quq今天收到了第一封Github的issue~</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/zzUxQ7XZs/">7月摸鱼感言</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/UJKNiYi4I/">今天在乐山玩了一圈quq</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/ej1zVG4-3/">日语基础-适合初心者的日语基础知识的体系化整理-50音图</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/6WNXsaHV6/">使用node js在Android手机上获取pixiv（P站）的每日top50</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge ">
+          杂谈
+        </a>
+      
+        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge secondary">
+          公告
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    <img src="https://count.getloli.com/get/@moeyukiblog?theme=gelbooru-h" alt="Moe Count" /><br><a href='https://show.lolipet.moe/'>初雪的朋友们</a> | <a class="rss" href="https://yuki.yuki233.com/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '349c8406e994852bfc66',
+        clientSecret: 'dbc4a7a453ba9d5de4c77e9ff1cc841fa465a43b',
+        repo: 'yuki.yuki233.com',
+        owner: 'hatsuyuki280',
+        admin: ['hatsuyuki280'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

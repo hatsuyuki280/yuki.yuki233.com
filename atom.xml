@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://yuki.yuki233.com</id>
     <title>某初雪的无名blog</title>
-    <updated>2021-05-28T05:42:56.736Z</updated>
+    <updated>2021-05-28T07:16:05.519Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://yuki.yuki233.com"/>
     <link rel="self" href="https://yuki.yuki233.com/atom.xml"/>
@@ -20,5 +20,89 @@
 ]]></summary>
         <content type="html"><![CDATA[<p>本站已经顺利完成了基础的功能的迁移，因此特意发了这篇文章庆祝一下（顺便当作新站点的HelloWord文章）</p>
 ]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[本站迁移时遇到的诸多问题及对应的解决方案]]></title>
+        <id>https://yuki.yuki233.com/post/VVlVUALjd/</id>
+        <link href="https://yuki.yuki233.com/post/VVlVUALjd/">
+        </link>
+        <updated>2019-05-15T08:10:25.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[如何在Linux上部署SMB服务]]></title>
+        <id>https://yuki.yuki233.com/post/LaGIS7D9T/</id>
+        <link href="https://yuki.yuki233.com/post/LaGIS7D9T/">
+        </link>
+        <updated>2019-05-01T08:07:21.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[MikroTik Cloud Router Switch的配置]]></title>
+        <id>https://yuki.yuki233.com/post/Dguep2QKR/</id>
+        <link href="https://yuki.yuki233.com/post/Dguep2QKR/">
+        </link>
+        <updated>2019-04-16T07:56:27.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[好开心quq今天收到了第一封Github的issue~]]></title>
+        <id>https://yuki.yuki233.com/post/PeEMlVzN2/</id>
+        <link href="https://yuki.yuki233.com/post/PeEMlVzN2/">
+        </link>
+        <updated>2018-07-19T08:01:04.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[7月摸鱼感言]]></title>
+        <id>https://yuki.yuki233.com/post/zzUxQ7XZs/</id>
+        <link href="https://yuki.yuki233.com/post/zzUxQ7XZs/">
+        </link>
+        <updated>2018-07-11T08:48:56.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[今天在乐山玩了一圈quq]]></title>
+        <id>https://yuki.yuki233.com/post/UJKNiYi4I/</id>
+        <link href="https://yuki.yuki233.com/post/UJKNiYi4I/">
+        </link>
+        <updated>2018-05-28T08:53:31.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[日语基础-适合初心者的日语基础知识的体系化整理-50音图]]></title>
+        <id>https://yuki.yuki233.com/post/ej1zVG4-3/</id>
+        <link href="https://yuki.yuki233.com/post/ej1zVG4-3/">
+        </link>
+        <updated>2018-05-28T08:42:26.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[使用node js在Android手机上获取pixiv（P站）的每日top50]]></title>
+        <id>https://yuki.yuki233.com/post/6WNXsaHV6/</id>
+        <link href="https://yuki.yuki233.com/post/6WNXsaHV6/">
+        </link>
+        <updated>2018-05-27T08:50:01.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Android使用Tasker链接学校的WiFi——//虽然最终用的还是shell(未完待续)]]></title>
+        <id>https://yuki.yuki233.com/post/pu6OK_btj/</id>
+        <link href="https://yuki.yuki233.com/post/pu6OK_btj/">
+        </link>
+        <updated>2018-05-19T09:02:57.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[学校wifi认证好难受，自己写了个自动化quq]]></title>
+        <id>https://yuki.yuki233.com/post/i0FeAuMw1/</id>
+        <link href="https://yuki.yuki233.com/post/i0FeAuMw1/">
+        </link>
+        <updated>2018-05-18T07:59:55.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[使用 Cloudflare API 实现 DDns]]></title>
+        <id>https://yuki.yuki233.com/post/J34NTIegp/</id>
+        <link href="https://yuki.yuki233.com/post/J34NTIegp/">
+        </link>
+        <updated>2018-05-17T08:11:55.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[本站已支持多因素验证登陆]]></title>
+        <id>https://yuki.yuki233.com/post/SeuKiN8ia/</id>
+        <link href="https://yuki.yuki233.com/post/SeuKiN8ia/">
+        </link>
+        <updated>2018-01-28T06:43:22.000Z</updated>
     </entry>
 </feed>

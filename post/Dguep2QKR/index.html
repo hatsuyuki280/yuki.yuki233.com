@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>关于 | 某初雪的无名blog</title>
+<title>MikroTik Cloud Router Switch的配置 | 某初雪的无名blog</title>
 <meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -87,25 +87,64 @@
       <div class="sm-12 md-8 col">
         <div class="paper">
           <article class="article">
-            <h1>关于</h1>
+            <h1>MikroTik Cloud Router Switch的配置</h1>
             <p class="article-meta">
-              2019-01-25
+              2019-04-16
               
             </p>
             
             <div class="post-content">
-              <blockquote>
-<p>欢迎来到我的小站呀，很高兴遇见你！🤝</p>
-</blockquote>
-<h2 id="关于本站">🏠 关于本站</h2>
-<h2 id="博主是谁">👨‍💻 博主是谁</h2>
-<h2 id="兴趣爱好">⛹ 兴趣爱好</h2>
-<h2 id="联系我呀">📬 联系我呀</h2>
+              <p style="text-align: center;">前言。。</p>
+先说一下东西的来历好了。。。朋友近期打算放个迷你服务器在咱家，但是咱家内网环境有点不容乐观（<del>唯一的网络设备是淘宝买的TPlink路由器</del>）于是处于种种考虑，顺便从美亚买了这款交换机一并拿来让咱先用着，不得不说美亚的配送速度不知道比国内某些店家高到哪里去。。。。3天就到了
+<p>咱之前没用过除了淘宝路由器之外的任何网络设备所以没办法对这款产品做出任何评价。。。本文也只是姑且充当一个记事的作用，防止哪天手贱删掉了配置文件。。。。</p>
+<p style="text-align: center;">概况</p>
+交换机的型号是：CRS125-24G-15-2HnD-IN 白色
+<p>所有的接口包括一个RJ45接口的console，24个千兆RJ45网口，一个SFP接口（大概可以插光纤模块），一个microUSB2.0，一组（两根）WLAN天线（只支持2.4G b/g/n），一个电源接口</p>
+<p>除上述接口外，机箱顶部还有一个支持触摸LED显示屏（电阻屏），背部的散热孔疑似有风扇（然而好像并没有，所以大概是公用外壳）</p>
+<p>cpu没存之类的基础配置暂时忘掉了。。。事后有机会再补上好了</p>
+<p>整体来说比想象的轻很多（大概咱印象里交换机都是那种放在机柜里的大家伙？）</p>
+<h1 id="都折腾了点啥">都折腾了点啥</h1>
+<p>其实。。啥也没折腾到。。。大概也就是配置了一下单线多拨（基于网线的。。。），配置了一下基础的内网到外网的NAT，配置了一下内网用的静态DNS，然后大概就没了</p>
+<p>开始的一两天无从下手，基本也就是各种看google和官方教程还有熟悉系统（<del>其实是在鸽</del>），然后某天朋友表示。。。“你要是近期不打算折腾的话就把网连上，我来弄”</p>
+<p>秉持着若不作死誓不为人的精神，妥善回绝了朋友的好意（<del>其实是气急败坏的</del>），然后花了一整天时间正式的设置了一波。</p>
+<h1 id="拨号">拨号</h1>
+<p>当然是插电源线和网线了，按照官方的推荐，吧WAN插进Eth1，然后开始插LAN的设备（一开始以为那个RJ45的console是用来怼在电脑的网口上用的。。。结果插了半天没反应。。。）</p>
+<p>按照LED触摸屏上的提示访问 192.168.88.1 就可以看得到Switch的web UI管理界面了，说实话 。。。好丑。。。。</p>
+<p>按照其他dalao的blog的说法，下载了一个叫做WinBox的软件到电脑上（Windows），支持用MAC地址直接登陆。。。嗯。。。大概是怕刚拿到手IP没有配置吧。。。。</p>
+<p>然后清除了所有预设的配置。。。。（说实话。。。原本还想着如果默认配置能直接用的话就直接用好了。。。结果配置完pppoe和局域网之后设备直接掉线了。。。按照LED屏幕上的说法好像是自动把Eth1的内网地址设置成192.168.1.1了。。。）</p>
+<p>首先就是先联网了，考虑到打算做多拨，于是在Interface窗口里向Eth1下面添加了两个VRRP（好像是用来负载均衡的。。。而且是只有在一个掉线的情况下才会去用另一个。。不过目前为止也只能先这样配置一下了。。。现阶段知道的关于switch的知识太过不足。。。）<img class="alignnone wp-image-117 size-full" src="https://yuki.yuki233.com/wp-content/uploads/2018/10/photo_2018-10-13_23-40-55.jpg" alt="" width="1280" height="635" /></p>
+<p>反正添加VRRP也只是选择一个interface然后起个名字的事。。。大概都知道怎么操作，所以这里就不截图了。。。</p>
+<p>然后打开IP-Address 给刚才的两个VRRP端口和用来连接网络的实体网卡各添加一个IP（教程上说需要配置在同一网段，如10.0.0.1/24，10.0.0.2/24，WAN的话ip随意，比如192.168.254.1）</p>
+<p>再然后是创建两个PPPoE的客户端，也一样从Interface窗口里点击加号就可以配置了，interface分别选择到两个创建好的VRRP接口上就完事了，成功拨号后PPPoE客户端的状态会变成R，VRRP的状态会变成RM，如果状态不对的话可以准备检查一下配置了哦quq</p>
+<p>到此，拨号过程就完啦quq</p>
+<p> </p>
+<h1 id="创建lan">创建LAN</h1>
+<p>首先需要做的就是建立一个Bridge啦（不过好像还可以用标签方式，不过这个方法咱当初没有尝试，现在已经勉强投入实际使用了，也不方便尝试，如果以后哪次作死结束后闲了大概可以试试）</p>
+<h1 id="刚才说的标签方式">刚才说的标签方式：</h1>
+<p>就是像这样把需要的分类的接口添加到这样的列表里，然后大概就可以按照列表来代替bridge了&lt;&lt; 没试过，暂时不推荐尝试</p>
+<img class="alignnone size-full wp-image-118" src="https://yuki.yuki233.com/wp-content/uploads/2018/10/photo_2018-10-14_00-02-19.jpg" alt="" width="802" height="676" />
+<p>总之是新建一个bridge，然后把需要放进去的接口全部一个一个添加进去。。。。</p>
+<img class="alignnone size-full wp-image-119" src="https://yuki.yuki233.com/wp-content/uploads/2018/10/photo_2018-10-14_00-07-16.jpg" alt="" width="805" height="621" />
+<p>桥的话随便起个名字然后保存就好了。。。别的设置都不用，添加端口的时候注意一定不要选择所有涉及到外网的设备。。。比如咱之前interface里的 To 光 , PPPoE , VRRP之类的设备，如果打算使用无线网络，记得把WLAN也一并加进来。。。</p>
+<p>然后局域网也就做好了</p>
+<h1 id="创建nat让内外网互通">创建NAT，让内外网互通</h1>
+<p>等待下一次更新好了quq。。。。</p>
 
             </div>
           </article>
         </div>
         <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/PeEMlVzN2/">
+                <h3 class="post-title">
+                  好开心quq今天收到了第一封Github的issue~
+                </h3>
+              </a>
+            </div>
           
         </div>
         
@@ -229,7 +268,7 @@
     </div>
     <div class="row">
       
-        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge ">
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge warning">
           杂谈
         </a>
       

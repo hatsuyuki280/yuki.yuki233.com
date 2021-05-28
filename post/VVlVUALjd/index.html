@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>关于 | 某初雪的无名blog</title>
+<title>本站迁移时遇到的诸多问题及对应的解决方案 | 某初雪的无名blog</title>
 <meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -87,25 +87,64 @@
       <div class="sm-12 md-8 col">
         <div class="paper">
           <article class="article">
-            <h1>关于</h1>
+            <h1>本站迁移时遇到的诸多问题及对应的解决方案</h1>
             <p class="article-meta">
-              2019-01-25
+              2019-05-15
               
             </p>
             
             <div class="post-content">
-              <blockquote>
-<p>欢迎来到我的小站呀，很高兴遇见你！🤝</p>
-</blockquote>
-<h2 id="关于本站">🏠 关于本站</h2>
-<h2 id="博主是谁">👨‍💻 博主是谁</h2>
-<h2 id="兴趣爱好">⛹ 兴趣爱好</h2>
-<h2 id="联系我呀">📬 联系我呀</h2>
-
+              <p># 前言这篇文章姑且是用来随手记录了下之前迁移本站点到虚拟主机时遇到的一系列问题和解决方案的，仅对咱自己当时遇到的问题负责，并不保证在任何时刻对任何版本的数据库/phpmyadmin等数据库软件及数据库管理软件有效、不保证对任何主机提供商的设备/服务器程序有效，此外不对由此博文引起的一切直接或间接损失负责
+</p>
+<p>两边的区别</p>
+<!-- wp:table {"align":"center","className":"is-style-stripes"} -->
+<table class="wp-block-table aligncenter is-style-stripes"><tbody><tr><td></td><td>旧设备</td><td>新设备</td><td>备注</td></tr><tr><td>PHP版本</td><td>7.2</td><td>7.1 / 5.6.38 </td><td></td></tr><tr><td>HTTP服务器版本</td><td>Nginx</td><td>Apache</td><td>版本号应该没什么影响</td></tr><tr><td>phpMyAdmin版本</td><td>4.8.4</td><td>4.8.3</td><td></td></tr><tr><td>操作系统</td><td>debian 9</td><td>虚拟主机</td><td></td></tr><tr><td>数据库版本</td><td>10.1.37-MariaDB</td><td>5.5.60-MariaDB </td><td></td></tr><tr><td>数据库编码</td><td>UTF8mb4-general</td><td>UTF8mb4-general</td><td>默认好像是GBK</td></tr><tr><td>数据库名</td><td>A</td><td>B</td><td>数据库名不同</td></tr></tbody></table>
+<!-- /wp:table -->
+<p># 首先先说说一般流程</p>
+<ol>
+<li>打包所有站点文件</li>
+<li>在旧设备上安装 <a href="https://www.phpmyadmin.net/" target="_blank" rel="noopener">phpMyAdmin</a></li>
+<li>使用数据库登陆凭证登陆到原站点的数据库</li>
+<li>备份（导出）数据</li>
+<li>将旧站点设置为关闭模式（防止产生新数据）</li>
+<li>修改解析</li>
+<li>上传站点文件到新站点</li>
+<li>登陆到新服务器数据库</li>
+<li>恢复数据</li>
+<li>调试新站点，确保访问正常（检查 rewrite/ssl/文件权限/数据库 等设置）</li>
+<li>完成（<del>旧服务器可以删库跑路了</del>）</li>
+</ol>
+<p>之所以选择使用phpMyAdmin的原因是部署简单功能齐全，而且几乎所有的虚拟主机运营商都提供phpMyAdmin的数据库管理面板（正好这次的目标主机用的就是这个）。</p>
+<p>注：咱第一次导出时为了防止两边的 phpMyAdmin 版本悬殊造成的不兼容，导出时手动启用了各种看起来可以增加兼容性的选项，后面发现好像不启用也无所谓。。。</p>
+<p>
+</p>
+<p># 遇到的问题及解决方法</p>
+<p>Q：数据库恢复的时候提示无法找到名为xxx的数据库</p>
+<p>A：重新导出；导出时选择自定义，并勾选“重命名导出的数据库/表/列”，然后在新窗口中选择对应数据库并输入新数据库中预计用于存放该数据库的新数据库名，然后点击添加-保存并关闭。</p>
+<p>Q：数据库导入后乱码，所有中文都变成了“？？？”</p>
+<p>A：字符串编码错误，清空数据库重新导入，导入前设置数据库的编码方式为UTF8mb4-general（记得点提交&gt;////&lt;）</p>
+<p>Q：网站连接不上数据库（忘记修改保存了的密码了。。。）</p>
+<p>A：使用文本编辑器修改 wp-config.php 里面的数据库登录信息（推荐先备份原文件）</p>
+<p>Q：没办法使用SSL（主机商不支持Certbot自动申请。。。）</p>
+<p>A：这个问题有点棘手。。。。折中了一下，咱的解决方案时使用Certbot手动申请证书。。。。并使用Curl把申请到的证书丢进服务器。。。。当时随手写的shell script可以看咱的<a href="https://github.com/hatsuyuki280/Yuki-tools/blob/master/Update-SSL-Cert-for-yunloli.sh" target="_blank" rel="noopener">Github存储库</a>自动实现的部分最近比较懒所以没写</p>
+<p>大致就这些？</p>
+<p>
+</p>
             </div>
           </article>
         </div>
         <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/LaGIS7D9T/">
+                <h3 class="post-title">
+                  如何在Linux上部署SMB服务
+                </h3>
+              </a>
+            </div>
           
         </div>
         
@@ -229,7 +268,7 @@
     </div>
     <div class="row">
       
-        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge ">
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge warning">
           杂谈
         </a>
       

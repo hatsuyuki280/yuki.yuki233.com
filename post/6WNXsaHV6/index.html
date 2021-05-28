@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>关于 | 某初雪的无名blog</title>
+<title>使用node js在Android手机上获取pixiv（P站）的每日top50 | 某初雪的无名blog</title>
 <meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -87,25 +87,61 @@
       <div class="sm-12 md-8 col">
         <div class="paper">
           <article class="article">
-            <h1>关于</h1>
+            <h1>使用node js在Android手机上获取pixiv（P站）的每日top50</h1>
             <p class="article-meta">
-              2019-01-25
+              2018-05-27
               
             </p>
             
             <div class="post-content">
-              <blockquote>
-<p>欢迎来到我的小站呀，很高兴遇见你！🤝</p>
-</blockquote>
-<h2 id="关于本站">🏠 关于本站</h2>
-<h2 id="博主是谁">👨‍💻 博主是谁</h2>
-<h2 id="兴趣爱好">⛹ 兴趣爱好</h2>
-<h2 id="联系我呀">📬 联系我呀</h2>
-
+              <p style="text-align: center; padding-left: 30px;">首先肯定是介绍要用的东西啦</p>
+<p style="padding-left: 30px; text-align: center;"><img class="alignnone size-medium wp-image-89" src="https://yuki.yuki233.com/wp-content/uploads/2018/08/Screenshot_2018-08-06-03-44-29-947_com.android.vending-169x300.png" alt="" width="169" height="300" /></p>
+<p style="padding-left: 30px; text-align: center;">创建手机上的node环境使用的是这个app，下载地址相关的可以在能访问Google的情况下点击下面的<span style="text-decoration: underline;">云盘下载</span>，如果不能访问Google的话可以尝试点击<span style="text-decoration: underline;">本地下载</span>（未测试过没有Google框架是否能正常运行，暂未提供）</p>
+<p style="text-align: center;">https://play.google.com/store/apps/details?id=io.tempage.dorynode</p>
+&nbsp;
+<p style="text-align: center;">然后就是用来爬每日top50的脚本啦，这里作为示例使用的是GitHub上iMyon/pixivPicker的脚本，<a href="https://github.com/iMyon/pixivPicker" target="_blank" rel="noopener">存储库地址点击这里</a>，同样的，点击云盘下载将会直接从github下载压缩包，本地下载暂时还未提供</p>
+<p style="text-align: center;">https://github.com/iMyon/pixivPicker/archive/master.zip</p>
+<p style="text-align: center;">这个脚本的使用教程原作者也有写，可以参考这个项目的GitHub页面，这里就不进行引用了</p>
+<p style="text-align: center;"></p>
+# 操作过程
+<p>首先打开软件node js啥啥啥那个，桌面上点图标进去就行了。。。</p>
+<img class="alignnone size-medium wp-image-95" src="https://yuki.yuki233.com/wp-content/uploads/2018/08/Screenshot_2018-08-06-03-46-03-794_io.tempage.dorynode-169x300.png" alt="" width="169" height="300" />
+<p>第一次启动的时候会提示正在安装nodejs和npm，等待完成。不过为了防止第一次启动没有自动安装环境，点击右上角菜单按钮，在弹出来的菜单里选择reinstall</p>
+<p>虽然软件本身支持gitclone，不过本次演示了，将之前下载好的压缩包解压到喜欢的目录，最好好找一点的，比如/sdcard/pixiv/top50。然后打开刚刚安装好的nodejs，点击右下角的加号，点击add file，然后从乱七八糟的目录里找到解压后的文件夹并选择其中的app.js</p>
+<img class="alignnone size-medium wp-image-93" src="https://yuki.yuki233.com/wp-content/uploads/2018/08/Screenshot_2018-08-06-03-48-50-983_io.tempage.dorynode-169x300.png" alt="" width="169" height="300" />
+<p>添加完成后点击主界面右上角的菜单按钮，打开console，cd到解压后的目录（具体的路径视手机系统不同，以小米为例）</p>
+<p><code>$ cd /sdcard/pixiv/top50/</code></p>
+<img class="alignnone size-medium wp-image-92" src="https://yuki.yuki233.com/wp-content/uploads/2018/08/Screenshot_2018-08-06-03-49-56-304_io.tempage.dorynode-169x300.png" alt="" width="169" height="300" />
+<p>然后使用npm install命令进行安装</p>
+<p><code>$ npm install</code></p>
+<img class="alignnone size-medium wp-image-96" src="https://yuki.yuki233.com/wp-content/uploads/2018/08/Screenshot_2018-08-06-04-09-15-133_io.tempage.dorynode-169x300.png" alt="" width="169" height="300" />
+<p>执行过程会有些慢，不需要太在意，等待完成，不要管那些报错（反正最终能用xd）。如果看到重新提示准备就绪（总之就是执行npm之前的那个状态）的话就是安装完了，这个时候点击右上角的叉叉❌关闭console。随后会返回程序的主界面。</p>
+<img class="alignnone size-medium wp-image-94" src="https://yuki.yuki233.com/wp-content/uploads/2018/08/Screenshot_2018-08-06-04-10-31-644_io.tempage.dorynode-169x300.png" alt="" width="169" height="300" />
+<p>这个时候点击start就可以运行啦～</p>
+<p> </p>
+<p>默认状态下是使用公用访客账号下载每日的top50到压缩包解压后的目录下的images文件夹内（会按照日期自动分文件夹，如果重复也不会下载第二遍）</p>
+<h1 id="高级功能">高级功能</h1>
+<p> </p>
+<p style="padding-left: 30px;">      <img class="alignnone size-medium wp-image-91" src="https://yuki.yuki233.com/wp-content/uploads/2018/08/Screenshot_2018-08-06-03-52-49-399_io.tempage.dorynode-169x300.png" alt="" width="169" height="300" /></p>
+高级功能的话可以从这里添加喜欢的参数，参数清单和解释可以从那个git存储库的readme获得，这里就不多赘述，如果需要的话，也可以打开解压后的文件夹里lib文件夹下的config.js进行配置，同样的可以从git的readme里找到相关介绍，这里也就不搬运了quq
+<p style="padding-left: 30px;"><img class="alignnone size-medium wp-image-90" src="https://yuki.yuki233.com/wp-content/uploads/2018/08/Screenshot_2018-08-06-03-52-54-337_io.tempage.dorynode-169x300.png" alt="" width="169" height="300" /></p>
+另外。。。既然看到了这里有开机自起的设置，感觉应该可以支持每天自动运行？但是咱还没找到，所以就先写到这里啦quq
+<p style="padding-left: 30px;"></p>
             </div>
           </article>
         </div>
         <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/pu6OK_btj/">
+                <h3 class="post-title">
+                  Android使用Tasker链接学校的WiFi——//虽然最终用的还是shell(未完待续)
+                </h3>
+              </a>
+            </div>
           
         </div>
         
@@ -229,11 +265,11 @@
     </div>
     <div class="row">
       
-        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge ">
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge secondary">
           杂谈
         </a>
       
-        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge success">
+        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge secondary">
           公告
         </a>
       

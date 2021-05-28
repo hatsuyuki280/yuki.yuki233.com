@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>使用 Cloudflare API 实现 DDns | 某初雪的无名blog</title>
+<meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://yuki.yuki233.com/favicon.ico?v=1622186114721">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://yuki.yuki233.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://yuki.yuki233.com">某初雪的无名blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>使用 Cloudflare API 实现 DDns</h1>
+            <p class="article-meta">
+              2018-05-17
+              
+            </p>
+            
+            <div class="post-content">
+              <h1 id="前言">前言</h1>
+<p>总的来说就是想利用 CF 提供的dns记录操作 API ，为有动态公网IP的设备提供动态域名解析服务（DDNS），以方便使用域名实时更新公网IP的变动</p>
+<h1 id="注意由于时间久远cloudflare的api操作也发生了变动请参考最新版的api文档">注意，由于时间久远，cloudflare的api操作也发生了变动，请参考最新版的api文档</h1>
+<h1 id="准备">准备</h1>
+<p>首先说到 API ，具有操作权限的 Auth-key 是肯定需要提前准备好的，### 可以通过这个步骤来进行查看</p>
+<ol>
+ 	<li>首先访问到 <a href="https://www.cloudflare.com/" target="_blank" rel="noopener noreferrer">Cloudflare官网</a></li>
+ 	<li>进行登陆</li>
+ 	<li>点击右上角头像并点击 My Profile (个人信息)</li>
+ 	<li>滚动到页面最下面，查看并记录 API Keys 中的 Global API Key ，他应该是一个由 0~9a~f 组成的字符串</li>
+</ol>
+<h3 id="如果没有-cf-账号的话请看这个步骤">如果没有 CF 账号的话请看这个步骤</h3>
+<ol>
+ 	<li>首先访问到 <a href="https://www.cloudflare.com/" target="_blank" rel="noopener noreferrer">Cloudflare官网</a></li>
+ 	<li>进行注册并完成邮箱认证</li>
+ 	<li>登陆域名控制台并点击 Add a Site 按钮添加一个域名的到 Cloudflare</li>
+ 	<li>按照提示完成域名 NS 的修改并等待 Cloudflare 进行认证</li>
+ 	<li>上述步骤完成后，点击右上角头像并点击 My Profile (个人信息)</li>
+ 	<li>滚动到页面最下面，查看并记录 API Keys 中的 Global API Key ，他应该是一个由 0~9a~f 组成的字符串</li>
+</ol>
+<p>除了 Auth key ，大概还需要了解一下 CF 的 API 操作方法<br>
+基本方法就是看文档啦【<a href="https://api.cloudflare.com/" target="_blank" rel="noopener noreferrer">直达链接</a>】（咱知道一般来看 blog 的人都不会去看文档的。。。所以特意摘要了一下）</p>
+<h3 id="操作方法">操作方法</h3>
+<ol>
+ 	<li>请求地址:
+<pre class="hl"><code class="">https://api.cloudflare.com/client/v4/</code></pre>
+</li>
+ 	<li>所有请求都必须包含 Auth-Key (就是之前让记下的 API-Key )和 Auth-Email 头以进行身份​​验证</li>
+ 	<li>通过 HTTPS 发送JSON格式的负载发送请求</li>
+ 	<li>通过 GET 方法访问想获取 ID 的位置可以获取想要的各种 ID</li>
+</ol>
+<p>为了进行操作，还需要简单的了解一个工具: cURL</p>
+<h3 id="curl-的简单使用说明">cURL 的简单使用说明</h3>
+<ul>
+ 	<li>基本格式
+<pre class="hl"><code class="">curl [参数] 地址</code></pre>
+</li>
+ 	<li>参数：
+<pre class="hl"><code class="">-H ##设置请求头部
+-X ##使用指定的方法 比如 PUT GET POST
+--data ##上传数据
+-v ##显示详细过程</code></pre>
+</li>
+</ul>
+部分没有默认安装 curl 的 Linux 发行版 请自行决定如何安装 curl
+<p>还有一个方便在 shell 环境下筛选出指定内容的工具 grep<br>
+大致上就是可以把输入的文本按照要求找到，支持正则表达式。。。具体的自己百度一下吧。。。本文就更多不赘述了。。。基本用法就是 grep [参数] [条件]。。。</p>
+<h1 id="实现">实现</h1>
+<p>首先通过阅读 CF 的 API 得知，更新域名的操作方法是 PUT 到</p>
+<pre class="hl"><code class="">https://api.cloudflare.com/client/v4/zones/[zone_id]/dns_records/[域名id]</code></pre>
+<p>然后通过阅读 CF 的 API 得知，获取各种ID的方法是直接 GET。。可以通过各种参数进行筛选。。</p>
+<p>于是就可以知道 zone_id 可以通过</p>
+<pre class="hl"><code class="">GET https://api.cloudflare.com/client/v4/zones</code></pre>
+<p>获得，并通过域名进行筛选，于是就变成了</p>
+<pre class="hl"><code class="">GET https://api.cloudflare.com/client/v4/zones?name=[你的域名(不包括二级域名及之后的部分)]</code></pre>
+<p>执行后就会收到回复### 整理一下长这样：</p>
+<pre class="hl"><code class="">{
+    "result":[{
+        "id":"//区域ID",
+        "name":"//域名",
+        "status":"active", //状态
+        "paused":false, //是否暂停
+        "type":"full",
+        "development_mode":0, //开发模式
+        "name_servers":[
+            "curt.ns.cloudflare.com",
+            "fiona.ns.cloudflare.com" //名称服务器
+        ],
+        "original_name_servers":[
+            //原名称服务器
+        ],
+        "original_registrar":原注册商,
+        "original_dnshost":原DNS主机,
+        "modified_on":"//最后修改时间",
+        "created_on":"//创建时间",
+        "activated_on":"激活时间",
+        "meta":{
+            标签
+        },
+        "owner":{
+            //所有者信息
+        },
+        "account":{
+            //账号相关的信息
+        },
+        "permissions":[
+            //各种权限
+        ],
+        "plan":{
+            //每次冲多少钱
+        }
+    }],
+    "result_info":{
+        //结果信息
+    },
+    "success":true, //是否成功
+    "errors":[], //错误代码
+    "messages":[] //信息
+}</code></pre>
+<p>然后获取想要的域名记录的id</p>
+<pre class="hl"><code class="">GET https://api.cloudflare.com/client/v4/zones/[刚才获取的zone_id]/dns_records?name=[已添加的，预计用于ddns的子域名(包括二级域名及之后的主机名)]</code></pre>
+<p>然后就会收到回复啦</p>
+<h3 id="整理之后大概长这样">整理之后大概长这样</h3>
+<pre class="hl"><code class="">{
+    "result":[{
+        "id":"//这个子域名的记录id",
+        "type":"A", //记录类型(比如 A 就是IPv4记录)
+        "name":"//刚才指定的子域名",
+        "content":"//现在指向的地址",
+        "proxiable":true, //是否可代理
+        "proxied":false, //是否启用代理(也就是CDN啦)
+        "ttl":1, //TTL 生存时间(单位:秒) 取值范围:1 or [120,2147483647]
+        "locked":false, //锁定
+        "zone_id":"//区域id",
+        "zone_name":"区域名称(域名)",
+        "modified_on":"//修改于",
+        "created_on":"//创建于",
+        "meta":{
+            //标签
+        }
+    }],
+        "result_info":{
+            //结果信息
+        },
+        "success":true, //是否成功
+        "errors":[], //错误代码
+        "messages":[] //信息
+}</code></pre>
+<p>然后就是检查公网IP地址。。。<br>
+比如直接 <pre class="hl"><code class="">curl ip.sb</code></pre><br>
+于是就可以直接发送请求啦</p>
+<h1 id="使用">使用</h1>
+<p>总之。。。。简单的整理下就是。。。</p>
+<pre class="hl"><code class="">#!/bin/bash
+AuthKey="" ##在这里输入 API Key
+AuthMail="" ##在这里输入在 Cloudflare 使用的邮箱
+DDnsName="" ##在这里输入已经添加的，预计用于ddns的完整域名（完整的。。比如希望使用ddns.example.com作为ddns域名时，输入ddns.example.com）
+domain="" ##在这里输入绑定到 Cloudflare 的域名（比如希望使用ddns.example.com作为ddns域名时，输入example.com）
+new_ip=$(curl ip.sb)
+zone_id=$(curl "https://api.cloudflare.com/client/v4/zones?name=$domain" -H "X-Auth-Email: $AuthMail" -H "X-Auth-Key: $AuthKey" | grep -oP "\"id\":\"[a-f\d]{32}"|grep -oP "[a-f\d]{32}"|head -n1)
+dns_record_id=$(curl "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records?name=$domain" -H "X-Auth-Email: $AuthMail" -H "X-Auth-Key: $AuthKey" | grep -oP "\"id\":\"[a-f\d]{32}"|grep -oP "[a-f\d]{32}"|head -n1)
+curl -X PUT "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records/$dns_record_id" -H "X-Auth-Email: $AuthMail" -H "X-Auth-Key: $AuthKey" --data '{"type":"A","name":"'$DDnsName'","content":"'$new_ip'","ttl":600,"proxied":false}'
+</code></pre>
+<p>把这个保存到 yukiddns.sh ，然后赋予可执行权限后定期运行这个脚本就可以了</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/SeuKiN8ia/">
+                <h3 class="post-title">
+                  本站已支持多因素验证登陆
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+          
+            <div class="paper" data-aos="fade-in">
+              <div id="gitalk-container"></div>
+            </div>
+          
+
+          
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://yuki.yuki233.com/images/avatar.png?v=1622186114721" class="no-responsive avatar">
+    <div class="text-muted">在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/hatsuyuki280" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/yuki233dayo" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/8mIx_8uO5/">【迁移成功】本站已成功从WordPress顺利迁移到了Gridea！</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/VVlVUALjd/">本站迁移时遇到的诸多问题及对应的解决方案</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/LaGIS7D9T/">如何在Linux上部署SMB服务</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/Dguep2QKR/">MikroTik Cloud Router Switch的配置</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/about/">关于</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/PeEMlVzN2/">好开心quq今天收到了第一封Github的issue~</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/zzUxQ7XZs/">7月摸鱼感言</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/UJKNiYi4I/">今天在乐山玩了一圈quq</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/ej1zVG4-3/">日语基础-适合初心者的日语基础知识的体系化整理-50音图</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/6WNXsaHV6/">使用node js在Android手机上获取pixiv（P站）的每日top50</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge success">
+          杂谈
+        </a>
+      
+        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge secondary">
+          公告
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    <img src="https://count.getloli.com/get/@moeyukiblog?theme=gelbooru-h" alt="Moe Count" /><br><a href='https://show.lolipet.moe/'>初雪的朋友们</a> | <a class="rss" href="https://yuki.yuki233.com/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '349c8406e994852bfc66',
+        clientSecret: 'dbc4a7a453ba9d5de4c77e9ff1cc841fa465a43b',
+        repo: 'yuki.yuki233.com',
+        owner: 'hatsuyuki280',
+        admin: ['hatsuyuki280'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

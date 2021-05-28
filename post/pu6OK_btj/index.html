@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Android使用Tasker链接学校的WiFi——//虽然最终用的还是shell(未完待续) | 某初雪的无名blog</title>
+<meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://yuki.yuki233.com/favicon.ico?v=1622186114721">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://yuki.yuki233.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://yuki.yuki233.com">某初雪的无名blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Android使用Tasker链接学校的WiFi——//虽然最终用的还是shell(未完待续)</h1>
+            <p class="article-meta">
+              2018-05-19
+              
+            </p>
+            
+            <div class="post-content">
+              <h1 id="前言">前言</h1>
+<p>之前看到好多dalao们都在Blog发布了如何解决学校WiFi链接比较麻烦的内容，于是咱也在想要不要水一期什么的于是经过多方询问和努力探索//<del datetime="2018-10-31T07:14:27+00:00">其实就是花了点时间看了看学校的wifi登陆页面</del>，终于从Chrome浏览器里复制出了用来链接学校WiFi的请求数据，经过长时间的摸索<del datetime="2018-10-31T07:21:20+00:00">(复制粘贴)</del>最终完成了今天的摸鱼目标</p>
+<h1 id="所用软件介绍">所用软件介绍</h1>
+<p>Chrome浏览器是一款不用介绍大家都知道的由某天朝不存在的公司开发的浏览器，F12开发工具也还是很好用的//<del>废话</del></p>
+<p>Tasker是一个可以自定义之后实现多种功能的应用程序（<del>并不觉得好用</del>）然后呢。。就没然后啦。。。姑且看到支持HTTP POST。。。还以为可以直接把请求头写好然后直接POST的。。。结果居然没办法定义头部。。。。只能发数据的样子。。。无奈又不知道怎么同时把数据和头部都写进data/file输入框里于是就只好放弃，从而转换思路，直接用shell实现这个功能</p>
+<p>于是直接来介绍一下Shell好了，众所周知Android上的Shell由于无法使用root权限（<del>Root过的人当咱没说</del>）因此很多操作都无法执行，但是幸运的是，Android的Shell好像自带了Curl。。。。瞬间感觉省事多了。。。除此之外，今天需要的所有操作也并不需要root权限，所以大可放心的继续往下看</p>
+<h1 id="请求内容的获取">请求内容的获取</h1>
+<p>比如我们可以随手打开一台可以使用wifi的电脑，然后连接一下学校的WiFi啥的。。。。然后就可以打开浏览器访问任何一个站点了//反正不要访问Google这种强制https的就行。。。。然后会发现已经进入了需要输入账户和密码的地方了，这个时候按下F12就可以打开网页的开发人员工具啦。。。//<del>电脑连了WiFi。。。截不到那个界面了。。。</del></p>
+<p>总之会抓到一堆提交的时候发送到服务器上的东西，内容大概如下所示</p>
+<h1 id="都post了啥">都POST了啥</h1>
+<p><code>目标地址<br>
+http://172.30.63.254/cgi-bin/webauth/auth.cgi</p>
+<h2 id="http请求头部">HTTP请求头部</h2>
+<p>Connection: keep-alive<br>
+Cache-Control: max-age=0<br>
+Origin: http://172.30.63.254<br>
+Upgrade-Insecure-Requests: 1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36<br>
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,<em>/</em>;q=0.8<br>
+Referer:[重定向自]<br>
+Accept-Encoding: gzip, deflate<br>
+Accept-Language: zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7'<br>
+x-hd-token: rent-your-own-vps</p>
+<h2 id="data">data</h2>
+<p>srcip=[本地IP]&amp;tmpid=[用户名]&amp;tmppass=[密码]&amp;id=[用户名]&amp;pass=[密码]&amp;url=[目标网址]&amp;cancel=[是否取消跳转(on/off)]&amp;rtnvalue=nodebug&amp;interval1=5&amp;interval2=5&amp;reason=3</code></p>
+<h1 id="修改成shell能用的样子">修改成shell能用的样子</h1>
+<p>首先直接复制出来成为curl命令<br>
+变成这样：<br>
+<code>curl 'http://172.30.63.254/cgi-bin/webauth/auth.cgi' -H 'Connection: keep-alive' -H 'Cache-Control: max-age=0' -H 'Origin: http://172.30.63.254' -H 'Upgrade-Insecure-Requests: 1' -H 'Content-Type: application/x-www-form-urlencoded' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,<em>/</em>;q=0.8' -H 'Referer:[重定向自]' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7' -H 'x-hd-token: rent-your-own-vps' -data 'srcip=[本地IP]&amp;tmpid=[用户名]&amp;tmppass=[密码]&amp;id=[用户名]&amp;pass=[密码]&amp;url=[目标网址]&amp;cancel=[是否取消跳转(on/off)]&amp;rtnvalue=nodebug&amp;interval1=5&amp;interval2=5&amp;reason=3</code><br>
+然而有一点就是。。。[本地IP]是每次链接都有可能会变的。。。。。于是就得想想其他办法。。。。<br>
+经过长时间的测试。。。。终于找到了比较合适的命令<code>ip addr show | egrep inet | egrep wlan0$ | sed 's/ /\n/g' | egrep [0-9.]+[/]+[0-9] | sed 's//..//'</code><br>
+执行后将会获得当前设备的无线网络的IPv4地址，比如<a href="https://yuki.yuki233.com/wp-content/uploads/2018/11/photo_2018-10-31_14-49-25.jpg" target="_blank" rel="noopener"><img class="aligncenter wp-image-147 size-full" src="https://yuki.yuki233.com/wp-content/uploads/2018/11/photo_2018-10-31_14-49-25.jpg" alt="" width="814" height="62" /></a></p>
+<h2 id="电脑版">电脑版</h2>
+<p>由于咱的笔记本网卡好像有点混乱因此直接按行数筛选了<code>ip addr show | sed -n 35p | sed 's/ /\n/g' | egrep [0-9.]+[/]+[0-9] | sed 's//..//'</code>会变成这个样子<a href="https://yuki.yuki233.com/wp-content/uploads/2018/11/photo_2018-11-19_21-28-53.jpg" target="_blank" rel="noopener"><img class="aligncenter wp-image-148 size-full" src="https://yuki.yuki233.com/wp-content/uploads/2018/11/photo_2018-11-19_21-28-53.jpg" alt="" width="971" height="241" /></a><br>
+于是修改后，那行curl命令就会变成这样：</p>
+<p><code>curl 'http://172.30.63.254/cgi-bin/webauth/auth.cgi' -H 'Connection: keep-alive' -H 'Cache-Control: max-age=0' -H 'Origin: http://172.30.63.254' -H 'Upgrade-Insecure-Requests: 1' -H 'Content-Type: application/x-www-form-urlencoded' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,<em>/</em>;q=0.8' -H 'Referer:[重定向自]' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7' -H 'x-hd-token: rent-your-own-vps' -data &quot;srcip=<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mi>i</mi><mi>p</mi><mi>a</mi><mi>d</mi><mi>d</mi><mi>r</mi><mi>s</mi><mi>h</mi><mi>o</mi><mi>w</mi><mi mathvariant="normal">∣</mi><mi>e</mi><mi>g</mi><mi>r</mi><mi>e</mi><mi>p</mi><mi>i</mi><mi>n</mi><mi>e</mi><mi>t</mi><mi mathvariant="normal">∣</mi><mi>e</mi><mi>g</mi><mi>r</mi><mi>e</mi><mi>p</mi><mi>w</mi><mi>l</mi><mi>a</mi><mi>n</mi><mn>0</mn></mrow><annotation encoding="application/x-tex">(ip addr show | egrep inet | egrep wlan0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mord mathdefault">p</span><span class="mord mathdefault">a</span><span class="mord mathdefault">d</span><span class="mord mathdefault">d</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">s</span><span class="mord mathdefault">h</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord">∣</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault">e</span><span class="mord mathdefault">t</span><span class="mord">∣</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">a</span><span class="mord mathdefault">n</span><span class="mord">0</span></span></span></span> | sed 's/ /\n/g' | egrep [0-9.]+[/]+[0-9] | sed 's//..//')&amp;tmpid=[用户名]&amp;tmppass=[密码]&amp;id=[用户名]&amp;pass=[密码]&amp;url=[目标网址]&amp;cancel=[是否取消跳转(on/off)]&amp;rtnvalue=nodebug&amp;interval1=5&amp;interval2=5&amp;reason=3&quot;</code><br>
+但是这里有一个问题啊。。。。虽然把获取本地ip的命令扔进curl里也无可厚非。。。但是终归不如只放一个变量进去，所以还是把那行命令提出来好了。。。<br>
+于是：</p>
+<p><code><span style="color: #ff0000;">$ scrip=<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mi>i</mi><mi>p</mi><mi>a</mi><mi>d</mi><mi>d</mi><mi>r</mi><mi>s</mi><mi>h</mi><mi>o</mi><mi>w</mi><mi mathvariant="normal">∣</mi><mi>e</mi><mi>g</mi><mi>r</mi><mi>e</mi><mi>p</mi><mi>i</mi><mi>n</mi><mi>e</mi><mi>t</mi><mi mathvariant="normal">∣</mi><mi>e</mi><mi>g</mi><mi>r</mi><mi>e</mi><mi>p</mi><mi>w</mi><mi>l</mi><mi>a</mi><mi>n</mi><mn>0</mn></mrow><annotation encoding="application/x-tex">(ip addr show | egrep inet | egrep wlan0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mord mathdefault">p</span><span class="mord mathdefault">a</span><span class="mord mathdefault">d</span><span class="mord mathdefault">d</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">s</span><span class="mord mathdefault">h</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord">∣</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault">e</span><span class="mord mathdefault">t</span><span class="mord">∣</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">a</span><span class="mord mathdefault">n</span><span class="mord">0</span></span></span></span> | sed 's/ /\n/g' | egrep [0-9.]+[/]+[0-9] | sed 's//..//')</span><br>
+$ curl 'http://172.30.63.254/cgi-bin/webauth/auth.cgi' -H 'Connection: keep-alive' -H 'Cache-Control: max-age=0' -H 'Origin: http://172.30.63.254' -H 'Upgrade-Insecure-Requests: 1' -H 'Content-Type: application/x-www-form-urlencoded' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,<em>/</em>;q=0.8' -H 'Referer:[重定向自]' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7' -H 'x-hd-token: rent-your-own-vps' -data &quot;srcip=<span style="color: #ff0000;">$scrip</span>&amp;tmpid=[用户名]&amp;tmppass=[密码]&amp;id=[用户名]&amp;pass=[密码]&amp;url=[目标网址]&amp;cancel=[是否取消跳转(on/off)]&amp;rtnvalue=nodebug&amp;interval1=5&amp;interval2=5&amp;reason=3&quot;<br>
+</code></p>
+<p> </p>
+<h1 id="整理成简洁明了的样子">整理成简洁明了的样子</h1>
+<p>刚刚那样确实自用也够了。。。。但是为了让其他人也可以看得懂或者说好操作。。。这种一长串的肯定不行。。。。最好直接整理成一个脚本。。。。。一目了然的把需要修改才能用的部分放到外面嘛。。。</p>
+<p>于是：<br>
+<code><span style="color: #005500;">#! /bin/bash    ##指定解释器为bash</span><br>
+<span style="color: #00ccff;">## 在这里输入用户名和密码</span><br>
+<span style="color: #ff0000;">$ ID=[学校的登陆名]<br>
+$ PASSWD=[学校的登陆密码]</span><br>
+<span style="color: #00ccff;">## 自动获取当前设备wlan0的IP地址</span><br>
+$ scrip=<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mi>i</mi><mi>p</mi><mi>a</mi><mi>d</mi><mi>d</mi><mi>r</mi><mi>s</mi><mi>h</mi><mi>o</mi><mi>w</mi><mi mathvariant="normal">∣</mi><mi>e</mi><mi>g</mi><mi>r</mi><mi>e</mi><mi>p</mi><mi>i</mi><mi>n</mi><mi>e</mi><mi>t</mi><mi mathvariant="normal">∣</mi><mi>e</mi><mi>g</mi><mi>r</mi><mi>e</mi><mi>p</mi><mi>w</mi><mi>l</mi><mi>a</mi><mi>n</mi><mn>0</mn></mrow><annotation encoding="application/x-tex">(ip addr show | egrep inet | egrep wlan0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mord mathdefault">p</span><span class="mord mathdefault">a</span><span class="mord mathdefault">d</span><span class="mord mathdefault">d</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">s</span><span class="mord mathdefault">h</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord">∣</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault">e</span><span class="mord mathdefault">t</span><span class="mord">∣</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">e</span><span class="mord mathdefault">p</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">a</span><span class="mord mathdefault">n</span><span class="mord">0</span></span></span></span> | sed 's/ /\n/g' | egrep [0-9.]+[/]+[0-9] | sed 's//..//')<br>
+<span style="color: #00ccff;">## 使用curl进行发送</span><br>
+$ curl 'http://172.30.63.254/cgi-bin/webauth/auth.cgi' -H 'Connection: keep-alive' -H 'Cache-Control: max-age=0' -H 'Origin: http://172.30.63.254' -H 'Upgrade-Insecure-Requests: 1' -H 'Content-Type: application/x-www-form-urlencoded' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,<em>/</em>;q=0.8' -H 'Referer:[重定向自]' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7' -H 'x-hd-token: rent-your-own-vps' -data &quot;srcip=<span class='katex-error' title='ParseError: KaTeX parse error: Expected &#039;EOF&#039;, got &#039;&amp;&#039; at position 6: scrip&amp;̲amp;&lt;span style…'>scrip&amp;amp;&lt;span style=&quot;color: #ff0000;&quot;&gt;tmpid=</span>ID&amp;tmppass=<span class='katex-error' title='ParseError: KaTeX parse error: Expected &#039;EOF&#039;, got &#039;&amp;&#039; at position 7: PASSWD&amp;̲amp;id='>PASSWD&amp;amp;id=</span>ID&amp;pass=$PASSWD</span>&amp;url=[目标网址]&amp;cancel=[是否取消跳转(on/off)]&amp;rtnvalue=nodebug&amp;interval1=5&amp;interval2=5&amp;reason=3&quot;</code><br>
+现在无论是谁都可以直接复制之后就使用这个在shell里进行登陆啦</p>
+<h1 id="那么tasker呢">那么Tasker呢？？？</h1>
+<p>至于Tasker有什么用。。。。。咱觉得已经没有任何意义了。。。不过介于每次在手机上打开控制台很麻烦，还是直接用tasker好了。。。。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/i0FeAuMw1/">
+                <h3 class="post-title">
+                  学校wifi认证好难受，自己写了个自动化quq
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+          
+            <div class="paper" data-aos="fade-in">
+              <div id="gitalk-container"></div>
+            </div>
+          
+
+          
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://yuki.yuki233.com/images/avatar.png?v=1622186114721" class="no-responsive avatar">
+    <div class="text-muted">在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/hatsuyuki280" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/yuki233dayo" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/8mIx_8uO5/">【迁移成功】本站已成功从WordPress顺利迁移到了Gridea！</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/VVlVUALjd/">本站迁移时遇到的诸多问题及对应的解决方案</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/LaGIS7D9T/">如何在Linux上部署SMB服务</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/Dguep2QKR/">MikroTik Cloud Router Switch的配置</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/about/">关于</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/PeEMlVzN2/">好开心quq今天收到了第一封Github的issue~</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/zzUxQ7XZs/">7月摸鱼感言</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/UJKNiYi4I/">今天在乐山玩了一圈quq</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/ej1zVG4-3/">日语基础-适合初心者的日语基础知识的体系化整理-50音图</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/6WNXsaHV6/">使用node js在Android手机上获取pixiv（P站）的每日top50</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge secondary">
+          杂谈
+        </a>
+      
+        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge secondary">
+          公告
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    <img src="https://count.getloli.com/get/@moeyukiblog?theme=gelbooru-h" alt="Moe Count" /><br><a href='https://show.lolipet.moe/'>初雪的朋友们</a> | <a class="rss" href="https://yuki.yuki233.com/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '349c8406e994852bfc66',
+        clientSecret: 'dbc4a7a453ba9d5de4c77e9ff1cc841fa465a43b',
+        repo: 'yuki.yuki233.com',
+        owner: 'hatsuyuki280',
+        admin: ['hatsuyuki280'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
