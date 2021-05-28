@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[水]用python写一个爬虫，多线程自动下载本子并打成压缩包quq | 某初雪的无名blog</title>
+<meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://yuki.yuki233.com/favicon.ico?v=1622187106007">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://yuki.yuki233.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://yuki.yuki233.com">某初雪的无名blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>[水]用python写一个爬虫，多线程自动下载本子并打成压缩包quq</h1>
+            <p class="article-meta">
+              2020-09-16
+              
+            </p>
+            
+            <div class="post-content">
+              <p>[infobox title=&quot;前言&quot;]</p>
+<p>前两天在群里聊天无意之间被人安利了一个看本子的网站，最近正好又准备在自己电脑上拿电子书管理软件把本子什么的整理下（当然，看到画风可爱的新本子还是会下载了再说的quq）</p>
+<p>但是被推荐的那个网站的下载功能不是很尽如人意，提供的种子连接性也不是很好，考虑到咱喜欢的本子也不多，但是又懒得一本本去单独找其他下载源，于是决定直接写个脚本爬下来</p>
+<p>[danger]使用爬虫爬取资源站的行为好孩子不要模仿quq[/danger]</p>
+<p>不过在此之前咱也没正经写过爬虫就是了。。首先观察了一下那个网站，缩略图和实际图片的url规则基本一致，实际请求的链接把直链作为请求的一部分被传入了另一个站点，姑且推测是cdn或者其他什么。。。但是经过测试通过原本的完整链接再爬取的话，有一定概率会被400，但是直接访问后面的直链就没有这个问题。。。。所以决定直接使用直链下载[/infobox]</p>
+<p>[infobox title=&quot;事前准备&amp;环境介绍&quot;]</p>
+<p>原本是准备直接python走到底的，但是前几天看到b站上有个神奇的专栏，讲如何用C写一个b站粉丝计数器的，结果实现过程是直接再终端执行curl去抓b站的api的。。。于是抱着玩梗的心态，这个爬虫的下载的部分就用wget完成好了quq（简单来说就是都已经import requests了，但就是不用quq）</p>
+<p>环境大概写下来就是Debian 10+Python3，使用到的python库有：<br>
+re （拿来正则）<br>
+requests（获取缩略图的链接）<br>
+bs4（拿来按标签找网页里的元素）<br>
+os（拿来执行wget和zip之类的系统里的命令）<br>
+事后还手动引用了_thread。。。姑且明面上整了个多线程？</p>
+<p>不过毕竟是本子站。。。又是资源站本文中就不使用真实url了。。。毕竟咱也不推荐或鼓励大家使用爬虫下载图站的资源（找图这件事最快乐的事情应该就是在无数不喜欢的图中找到自己喜欢的图），如果可能的话也希望大家如果爬取资源的的话能够尽量缓慢些爬取呢（毕竟有些资源站就是被无脑爬图爬死的。。。</p>
+<p>[/infobox]</p>
+<p>[infobox title=&quot;通过那个本子站的网页得知的信息&quot;]</p>
+<p>缩略图的原始链接大概长这样：https://H-Books.org/?search=https://t.example.com/time/stamp/and/pic/IDt.jpg<br>
+原图的原始链接大概长这样：https://H-Books.org/?search=https://i.example.com/time/stamp/and/pic/ID.jpg</p>
+<p>当然，根据前文咱的描述也可以知道。。。search=后面紧跟着的其实就是直链，所以之后就直接用后面的直链了。。。</p>
+<p>看本子的页面的html大概长这样</p>
+<pre class="hl"><code class="xml">&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;本子名称&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        <span class="html-tag">&lt;a <span class="html-attribute-name">class</span>="<span class="html-attribute-value">gallerythumb</span>" <span class="html-attribute-name">href</span>="#"&gt;
+</span><span class="html-tag">            &lt;img <span class="html-attribute-name">data-src</span>="https://H-Books.org/?search=https://t.example.com/time/stamp/and/pic/<span class="html-attribute-value">1t.jpg</span>"&gt;
+</span>        <span class="html-tag">&lt;/a&gt;
+</span>        &lt;a<span class="html-tag"> <span class="html-attribute-name">class</span>="<span class="html-attribute-value">gallerythumb</span>" <span class="html-attribute-name">href</span>="#"</span>&gt;以下省略更多页&lt;/a&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code> 然后就是经过测试发现直链本身没设置防盗链，也不对UA进行任何筛选。。。几乎可以说写成爬虫也是爬虫里最简单的那种。</pre>
+<p>[/infobox]</p>
+<p>[infobox title=&quot;代码和简单介绍&quot;]</p>
+<p>[collapse title=&quot;完整版的代码折叠在这里了&quot;]</p>
+<pre class="hl"><code class="python">#!/usr/bin/python3
+from bs4 import BeautifulSoup as bs
+import requests as req
+import _thread as tr
+import os,re
+
+def mp(tn, msg):
+    print("线程"+tn+":"+msg)
+
+def get_links(tn, url):
+    mp(tn, url)
+    raw = req.get(url)
+    res = bs(raw.text)
+    name = re.sub(r'[\/\\\:\*\?\"\&lt;\&gt;\|]', ' ', res.title.string.split('»')[0])
+    mp(tn, name)
+    pl = []
+    for i in res('a', class_='gallerythumb'):
+        pl.append(i.img.get('data-src').split('=')
+                  [1].replace('t.', 'i.', 1).replace('t.', '.'))
+    indir = pl[0].split('/')[-2]
+    os.makedirs(indir)
+    dlarc(name, pl, indir, tn)
+    os.removedirs(indir)
+    return 0
+
+def dlarc(name, pl, indir, tn):
+    fl = []
+    for i in pl:
+        fl.append(i.split('/')[-1])
+        # mp(tn,i)
+        os.system('wget -c \'{}\' -O \'./{}/{}\' 2&gt;/dev/null'.format(i, indir, i.split('/')[-1]))
+    mp(tn, pl[0])
+    for i in fl:
+        os.system(
+            'zip -gmrj \'{}.zip\' \'./{}/{}\' | grep stored'.format(name, indir, i))
+
+while 1:
+    org = input('请输入URL: ')
+    try:
+        tr.start_new_thread(get_link, (org.split('/')[-2], org))
+    except:
+        print ("Error: 无法启动线程")
+</code></pre>
+<p>[/collapse]</p>
+<p>首先定义了一个用来获取图片链接的函数，需要传入url，使用requests获取传入的url后把网页丢给bs4，然后通过bs4从网页找到本子的名称，缩略图对应的链接，并按照上面的规则把缩略图url修改成原图url（具体实现方法可以直接从bs4的文档里复制粘贴，这一切都要感谢美丽的汤可以给咱省下无数的时间用来偷懒quq），然后对本子名称进行简单检查，以防止压缩后文件中出现Windows下不能使用的字符。</p>
+<p>然后定义了下载和压缩的函数，然后简单的把上一个函数整理好的url逐一丢给wget，下载完成后再把文件全部丢给zip。。。大概也没什么可说的</p>
+<p>最后为了好看，增加了一个请求用户输入的欢迎语。。。</p>
+<p>最初咱的爬虫就到此为止了，不过由于直接直链下载，速度堪忧，通过Google找到了可以让速度飞升的好办法quq。。。多线程！<br>
+<del>（只不过python的多线程据说是样子货。。。不过对于下载这种纯io的事情，能用就行quq）</del></p>
+<p>因为咱也是第一次用，所以并不知道实际上应该怎么实现，但是好像只要在调用函数的事后通过_thread来调用就好了（不过根据实际测试结果，欢迎语的显示会变得不太对就是了）</p>
+<p>[/infobox]</p>
+<p>[infobox title=&quot;总结&quot;]</p>
+<p>找一堆喜欢的本子偶尔爬一爬也还挺有意思的quq。。。</p>
+<p>不过也真的是无聊到一种地步才会觉得爬图站会很快乐吧quq。。。</p>
+<p>本文与其说是教程。。。倒不如说是实在闲的没事干了随便水一水证明自己还有坚持咕咕咕罢了quq。。。[/infobox]</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/bvpPm_q7g/">
+                <h3 class="post-title">
+                  dalao们~~~（旧友链页面）
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+          
+            <div class="paper" data-aos="fade-in">
+              <div id="gitalk-container"></div>
+            </div>
+          
+
+          
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://yuki.yuki233.com/images/avatar.png?v=1622187106007" class="no-responsive avatar">
+    <div class="text-muted">在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/hatsuyuki280" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/yuki233dayo" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/7Wiz9duyN/">姑且。。把以前的旧文章全部搬过来了。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/8mIx_8uO5/">【迁移成功】本站已成功从WordPress顺利迁移到了Gridea！</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/D5wGkNdUI/">近期忙于重建blog，总之如果有各种问题需要联系咱的可能回复会很慢quq。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/1X2KhMRQQ/">Linux 下 新网卡命名规则</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/_s76ovCDv/">[水]用python写一个爬虫，多线程自动下载本子并打成压缩包quq</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/bvpPm_q7g/">dalao们~~~（旧友链页面）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/VCrVnOiyQ/">nginx的配置文件原来是这么用的。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/ahML50iaz/">通过文件夹共享，给文件夹一个出盘符</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/CWgwFCiIn/">突然搭建一个Konachan一样的色图站</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/I715vqjVt/">使用百度TTS API获取合成一句话</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge secondary">
+          杂谈
+        </a>
+      
+        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge success">
+          公告
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    <img src="https://count.getloli.com/get/@moeyukiblog?theme=gelbooru-h" alt="Moe Count" /><br><a href='https://show.lolipet.moe/'>初雪的朋友们</a> | <a class="rss" href="https://yuki.yuki233.com/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '349c8406e994852bfc66',
+        clientSecret: 'dbc4a7a453ba9d5de4c77e9ff1cc841fa465a43b',
+        repo: 'yuki.yuki233.com',
+        owner: 'hatsuyuki280',
+        admin: ['hatsuyuki280'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

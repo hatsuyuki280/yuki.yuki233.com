@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>通过文件夹共享，给文件夹一个出盘符 | 某初雪的无名blog</title>
+<meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://yuki.yuki233.com/favicon.ico?v=1622187106007">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://yuki.yuki233.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://yuki.yuki233.com">某初雪的无名blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>通过文件夹共享，给文件夹一个出盘符</h1>
+            <p class="article-meta">
+              2020-07-23
+              
+            </p>
+            
+            <div class="post-content">
+              <p>[infobox title=&quot;前言&quot;]</p>
+<p>简单介绍一下这个需求的背景好了。</p>
+<p>之前在群里聊天的时候看到有人询问怎么样可以给一个文件夹挂载出盘符。虽然不是很懂要做什么，后来询问后得知是某些人喜欢用盘符代替文件夹，但是分太多区也不合适。</p>
+<p>总之就是想要一种类似虚拟磁盘一样的东西，可以根据使用量自动分配磁盘空间(?)的感觉。</p>
+<p>然后就是由于目标使用的是 <a href="https://wikipedia.org/wiki/NVM_Express" target="_blank" rel="noopener noreferrer">NVMe</a> 的固态，因此想尽可能不要太损失性能。[/infobox]</p>
+<p>[infobox title=&quot;咱想到的解决方案&quot;]</p>
+<p>简单来说，跟标题一样，把文件夹共享出来，然后本地挂载，这样姑且可以解决想要看起来有很多盘符的需求。。。</p>
+<p>不过很明显的。。不是所有软件都能识别成磁盘（比如 Windows 下很有用的 <a href="https://docs.microsoft.com/en-us/windows/wsl/about" target="_blank" rel="noopener noreferrer">WSL</a> ( Windows Subsystem Linux （?）)就无法正确将添加的“网络”驱动器自动挂载到<code>/mnt/</code>下）</p>
+<p>操作步骤大致应该都能想到。。。这里就不过多赘述，不知道的话可以参阅 <a href="https://google.com/" target="_blank" rel="noopener noreferrer">Google</a> 寻找如何将本地文件夹共享&amp;如何映射网络驱动器。</p>
+<p>当然，相关权限什么的也不在本文讨论的重点。。。[/infobox]</p>
+<p>[infobox title=&quot;性能测试(?)&quot;]</p>
+<p>虽然说是性能测试，不过并不是专业的测试，也没有与其他软件的挂载方式做对照(据说“ <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/subst" target="_blank" rel="noopener noreferrer">subst</a> ”也可以实现这个需求，只不过不是全局挂载，切换用户或重启后可能需要重新挂载，咱也没怎么折腾这个，如果有人有机会做测试的话也欢迎告诉咱)</p>
+<p>[collapse title=&quot;测试环境(电脑配置)&quot;]</p>
+<p>简单的手敲一下好了</p>
+<p>CPU： <a href="https://ark.intel.com/content/www/cn/zh/ark/products/190884/intel-core-i5-9600kf-processor-9m-cache-up-to-4-60-ghz.html" target="_blank" rel="noopener noreferrer">Intel i5-9600KF</a>   (使用华硕主板的一键 5G 功能进行了小学生超频，测试时任务管理器显示频率 4.99GHz )</p>
+<p>内存：淘宝买的便宜 DDR4 2666 16G*2 （使用主板使用说明书推荐的安装方法进行的安装，未超频）</p>
+<p>主板：华硕家的 <a href="https://www.asus.com/Motherboards/TUF-Z390-PLUS-GAMING/" target="_blank" rel="noopener noreferrer">TUF-Z390-Plus Gaming</a></p>
+<p>网卡：板载 <a href="https://ark.intel.com/content/www/cn/zh/ark/products/82186/intel-ethernet-connection-i219-v.html" target="_blank" rel="noopener noreferrer">Intel I219-V</a> 网卡，千兆</p>
+<p>测试用的交换机： <a href="https://mikrotik.com/product/CRS125-24G-1S-2HnD-IN" target="_blank" rel="noopener noreferrer">Mikrotik CRS125-24G-1S-2HnD</a> （ 24 口千兆交换机，内网仅配置了 DHCP 和网桥，未添加内网防火墙规则）</p>
+<p>测试用的网线：随处可见的 <a href="https://en.wikipedia.org/wiki/Category_6_cable" target="_blank" rel="noopener noreferrer">Cat6</a> <a href="https://en.wikipedia.org/wiki/Twisted_pair" target="_blank" rel="noopener noreferrer">双绞线</a>，千兆应该还是跑得了的</p>
+<p>测试用的硬盘： <a href="https://ark.intel.com/content/www/cn/zh/ark/products/122580/intel-ssd-dc-p4510-series-2-0tb-2-5in-pcie-3-1-x4-3d2-tlc.html" target="_blank" rel="noopener noreferrer">intel p4510 2tb</a> ，使用带延长线的转接板连接至主板 <a href="https://en.wikipedia.org/wiki/M.2" target="_blank" rel="noopener noreferrer">M.2</a> 插槽 1 （详情参阅华硕官网的 <a href="https://www.asus.com/Motherboards/TUF-Z390-PLUS-GAMING/" target="_blank" rel="noopener noreferrer">datasheet</a> ）</p>
+<p>测试用的软件 <a href="https://www.microsoft.com/en-us/p/crystaldiskmark-shizuku-edition/9nblggh536cc" target="_blank" rel="noopener noreferrer">水晶雫（ UWP 版）</a>[/collapse]</p>
+<p>事先声明：并没有在专业测试环境下进行，测试用的目标盘为测试机的系统盘，测试时后台有开启大量(?)程序[collapse title=&quot;简单的摘要如下&quot;]TIM （就是疼迅家那个聊天软件，咱加了一堆群来着）</p>
+<p>Steam （测试的时候目测没有更新游戏）</p>
+<p>WeChat （跟 TIM 一样。。。是疼迅的聊天软件）</p>
+<p>一大堆 Onedrive 客户端（测试时没有正在进行的同步）</p>
+<p>Wallpaper Engine （三个屏幕都有跑动态壁纸，分别是 <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=835331043" target="_blank" rel="noopener noreferrer">nekopara 动态桌面</a>和另一个<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=879419431" target="_blank" rel="noopener noreferrer">しらたま画风的飘樱花的动态壁纸</a>） [/collapse]</p>
+<p>首先是<a href="https://en.wikipedia.org/wiki/Benchmark_(computing)" target="_blank" rel="noopener noreferrer">基准测试</a>，对 目标磁盘<code>C:/</code> 和目标文件夹 <code>C:/test</code> 分别进行了测试，两种测速方式并无明显性能区别[collapse title=&quot;结果分别如下图&quot;]<img class="size-full wp-image-236 aligncenter" src="https://s-sh-1094-yuki-pic.oss.dogecdn.com/%E5%88%9D%E9%9B%AA%E7%9A%84%E8%AF%84%E6%B5%8B%2Fc.jpg" alt="" width="1001" height="547" /><img class="aligncenter size-full" src="https://s-sh-1094-yuki-pic.oss.dogecdn.com/%E5%88%9D%E9%9B%AA%E7%9A%84%E8%AF%84%E6%B5%8B%2Fctest.jpg" width="1001" height="544" />[/collapse]</p>
+<p>然后对直接使用主机名，使用 127.0.0.1 ，使用通过本地局域网获取到的本机 ip 三种情况分别做了映射，然后分别做了测试，皆与标准测试并无明显差异[collapse title=&quot;结果截图分别如下&quot;]<img class="aligncenter size-full" src="https://s-sh-1094-yuki-pic.oss.dogecdn.com/%E5%88%9D%E9%9B%AA%E7%9A%84%E8%AF%84%E6%B5%8B%2Fhost.jpg" width="1002" height="550" /><img class="aligncenter size-full" src="https://s-sh-1094-yuki-pic.oss.dogecdn.com/%E5%88%9D%E9%9B%AA%E7%9A%84%E8%AF%84%E6%B5%8B%2F127.jpg" width="999" height="543" /><img class="aligncenter size-full" src="https://s-sh-1094-yuki-pic.oss.dogecdn.com/%E5%88%9D%E9%9B%AA%E7%9A%84%E8%AF%84%E6%B5%8B%2F192.jpg" width="997" height="545" />[/collapse]</p>
+<p>在对“通过本地局域网获取到的本机ip映射的本地网络驱动器”进行测速时，为验证出口带宽是否影响测试结果，间隔一段时间随手截了两次任务管理器的图作为参考，结论出口网卡也许不会影响测试结果，且不会占满带宽。[collapse title=&quot;测试截图&quot;]<img class="aligncenter size-full" src="https://s-sh-1094-yuki-pic.oss.dogecdn.com/%E5%88%9D%E9%9B%AA%E7%9A%84%E8%AF%84%E6%B5%8B%2Fnt1.jpg" width="1280" height="647" /><img class="aligncenter size-full" src="https://s-sh-1094-yuki-pic.oss.dogecdn.com/%E5%88%9D%E9%9B%AA%E7%9A%84%E8%AF%84%E6%B5%8B%2Fnt2.jpg" width="1280" height="691" />[/collapse]综上所述，使用通过本地网络映射( SMB )的方式将文件夹映射为带有盘符的驱动器，可行且对性能无明显影响[/infobox]</p>
+<p>[infobox title=&quot;总结&quot;]当然啦。。以上内容完全是随手测试的结果，仅供参考，上面提到的方法或者软件或者其他什么，咱也不确保在任何环境下都可以有效且没有对上面那堆东西有任何推荐的想法（毕竟没又恰饭，不过觉得感兴趣的话也欢迎在清楚自己在做什么的前提下进行尝试呢（换句话说，咱不对此带来的任何直接或间接损失负任何责任）quq）不确定今后会不会有更省事的解决方案。。。就算有也不确定会不会及时更新出来就是了quq[/infobox]</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/CWgwFCiIn/">
+                <h3 class="post-title">
+                  突然搭建一个Konachan一样的色图站
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+          
+            <div class="paper" data-aos="fade-in">
+              <div id="gitalk-container"></div>
+            </div>
+          
+
+          
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://yuki.yuki233.com/images/avatar.png?v=1622187106007" class="no-responsive avatar">
+    <div class="text-muted">在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/hatsuyuki280" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/yuki233dayo" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/7Wiz9duyN/">姑且。。把以前的旧文章全部搬过来了。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/8mIx_8uO5/">【迁移成功】本站已成功从WordPress顺利迁移到了Gridea！</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/D5wGkNdUI/">近期忙于重建blog，总之如果有各种问题需要联系咱的可能回复会很慢quq。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/1X2KhMRQQ/">Linux 下 新网卡命名规则</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/_s76ovCDv/">[水]用python写一个爬虫，多线程自动下载本子并打成压缩包quq</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/bvpPm_q7g/">dalao们~~~（旧友链页面）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/VCrVnOiyQ/">nginx的配置文件原来是这么用的。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/ahML50iaz/">通过文件夹共享，给文件夹一个出盘符</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/CWgwFCiIn/">突然搭建一个Konachan一样的色图站</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/I715vqjVt/">使用百度TTS API获取合成一句话</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge secondary">
+          杂谈
+        </a>
+      
+        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge success">
+          公告
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    <img src="https://count.getloli.com/get/@moeyukiblog?theme=gelbooru-h" alt="Moe Count" /><br><a href='https://show.lolipet.moe/'>初雪的朋友们</a> | <a class="rss" href="https://yuki.yuki233.com/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '349c8406e994852bfc66',
+        clientSecret: 'dbc4a7a453ba9d5de4c77e9ff1cc841fa465a43b',
+        repo: 'yuki.yuki233.com',
+        owner: 'hatsuyuki280',
+        admin: ['hatsuyuki280'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

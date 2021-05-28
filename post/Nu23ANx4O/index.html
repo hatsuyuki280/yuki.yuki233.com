@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Linux 下 find 命令的学习笔记 | 某初雪的无名blog</title>
+<meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://yuki.yuki233.com/favicon.ico?v=1622187106007">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://yuki.yuki233.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://yuki.yuki233.com">某初雪的无名blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Linux 下 find 命令的学习笔记</h1>
+            <p class="article-meta">
+              2019-09-19
+              
+            </p>
+            
+            <div class="post-content">
+              <p>[infobox title=&quot;前言&quot;]感觉很多时候使用find命令会省很多事，但是苦于一直不太会，每次都是被重复的事情累的焦头烂额才想起来还有个叫做 find 的工具。。。<br>
+这两天遇到了需要批量给文件改名字并修改权限的需求，无奈文件非常分散，目录层数也很多，总共少说有200-300个文件，自己纯手工 cd 了好多次，实在受不了这种单调的操作了，于是去网上搜有没有快捷命令。于是让咱认识到 find 这种平时可能只能用到一两次的功能，不好好学一下是不行的了。。。。所以就有了本文。<br>
+[/infobox]<br>
+[infobox title=&quot;基础用法&quot;]<br>
+按照其他命令的使用习惯，咱一直认为 find 命令也是 <code>$ find 文件名</code>或者<br>
+<code>$ find 目录 文件名</code>就可以了，结果每次都是被输出了一屏幕的无关路径再被返回一个无法找到“文件名”<br>
+网上查了一下之后依稀记得用法是在文件名前面多加一个 name 。。。可由于其他命令的使用习惯，每次输入的时候都是<code>$ find --name 文件名</code>。。。经过多次的被错误糊脸之后，终于记住了 find 的正确用法 <span style="color: #ff0000;"><code>$ find 目录 -name 文件名 [其他参数]</code></span><br>
+[/infobox]<br>
+[infobox title=&quot;快速区分文件和目录&quot;]<br>
+使用 find 命令可以筛选文件和目录，假设现在的目录如下所示：<br>
+<code>root@safufu:~/test# ll</code><br>
+<code>total 8</code><br>
+<code>-rw-r--r-- 1 root root    0 Jul 27 06:32 1.txt</code><br>
+<code>-rw-r--r-- 1 root root   56 Jul 27 06:36 123</code><br>
+<code>-rw-r--r-- 1 root root    0 Jul 27 06:34 123.txt</code><br>
+<code>-rw-r--r-- 1 root root    0 Jul 27 06:33 2.txt</code><br>
+<code>-rw-r--r-- 1 root root    0 Jul 27 06:33 3.txt</code><br>
+<code>-rw-r--r-- 1 root root    0 Jul 27 06:33 4.txt</code><br>
+<code>-rw-r--r-- 1 root root    0 Jul 27 06:33 5.txt</code><br>
+<code>drwxr-xr-x 2 root root 4096 Jul 27 06:54 dir.txt</code><br>
+则可以使用 -type 选项进行筛选<br>
+如使用 <code>find -name &quot;<em>.txt&quot;</code>找出来所有的文本文件，却不想要作为目录的 dir.txt则可以使用<code>find -name &quot;</em>.txt&quot; -type f</code> 来进行筛选<br>
+同理，只想找到目录则可以使用 <code>find -name &quot;<em>.txt&quot; -type d</code> 来进行筛选。<br>
+[collapse title=&quot;输出&quot;]<br>
+<code>root@safufu:~/test# find -name &quot;</em>.txt&quot;</code><br>
+<code>./4.txt</code><br>
+<code>./dir.txt</code><br>
+<code>./5.txt</code><br>
+<code>./3.txt</code><br>
+<code>./123.txt</code><br>
+<code>./1.txt</code><br>
+<code>./2.txt</code><br>
+<code>root@safufu:~/test# find -name &quot;<em>.txt&quot; -type f</code><br>
+<code>./4.txt</code><br>
+<code>./5.txt</code><br>
+<code>./3.txt</code><br>
+<code>./123.txt</code><br>
+<code>./1.txt</code><br>
+<code>./2.txt</code><br>
+<code>root@safufu:~/test# find -name &quot;</em>.txt&quot; -type d</code><br>
+<code>./dir.txt</code><br>
+<code>root@safufu:~/test#</code>[/collapse]<br>
+根据 find 的使用手册中的描述，可以使用 -type 来筛选出常见的UNIX文件类型<br>
+<code>b 块设备，c 字符设备，d 目录，p 管道，f 普通文件，l 符号链接，s socket，</code><br>
+<code>D door (Solaris)，筛选一种以上的文件类型可以使用英文逗号 &quot;,&quot; 链接</code><br>
+[/infobox]</p>
+<p>[infobox title=&quot;让命令更方便&quot;]</p>
+<p>回到一开始咱遇到的问题上，将所有文件权限设置为644，全部目录设置为755，即便可以把文件和目录区分开，也依然免不了弄一个chmod脚本之类的东西出来，说到底没省事太多，于是又去google上好好找了一下，发现 find 命令本身就支持把找到的对象的路径作为参数运行其他命令，选项是 <code>-exec 命令 ;</code> 或者 <code>-exec 命令 +</code>经过咱好好的研究，这两种方法传给命令的参数的样子不一样，另外还可以使用{}代替找到的对象的路径。具体可以查看下面的实例：<br>
+[collapse title=&quot;实例&quot;]<code>root@safufu:~/test# find . -type f -exec echo &quot;{}&quot; &gt; 123 ;</code><br>
+<code>root@safufu:~/test# cat 123</code><br>
+<code>./4.txt</code><br>
+<code>./5.txt</code><br>
+<code>./3.txt</code><br>
+<code>./123</code><br>
+<code>./123.txt</code><br>
+<code>./1.txt</code><br>
+<code>./2.txt</code><br>
+<code>root@safufu:~/test# find . -type f -exec echo &quot;{}&quot; &gt; 123 +</code><br>
+<code>root@safufu:~/test# cat 123</code><br>
+<code>./4.txt ./5.txt ./3.txt ./123 ./123.txt ./1.txt ./2.txt</code>[/collapse]<br>
+换句话说就是，一个会把每一个找到的对象单独丢给指定的命令执行一次，另一个会把所有对象打包丢给指定的命令。。。</p>
+<p>于是原本需要一行一行复制粘贴的chmod脚本就变成了一行命令<br>
+<code>find . -type f -exec chmod 644 &quot;{}&quot; ;</code> 目录操作也是同理<br>
+<code>find . -type d -exec chmod 755 &quot;{}&quot; ;</code> 问题解决，撒花~❀</p>
+<p>[/infobox]</p>
+<p>至于其他用法。。。咱也不太清楚，不过大概今后用到了的话会再更新进来的吧quq</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/UBJyJaKjW/">
+                <h3 class="post-title">
+                  经过了漫长的掉线时间。。。本站又活过来了quq。。。
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+          
+            <div class="paper" data-aos="fade-in">
+              <div id="gitalk-container"></div>
+            </div>
+          
+
+          
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://yuki.yuki233.com/images/avatar.png?v=1622187106007" class="no-responsive avatar">
+    <div class="text-muted">在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/hatsuyuki280" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/yuki233dayo" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/7Wiz9duyN/">姑且。。把以前的旧文章全部搬过来了。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/8mIx_8uO5/">【迁移成功】本站已成功从WordPress顺利迁移到了Gridea！</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/D5wGkNdUI/">近期忙于重建blog，总之如果有各种问题需要联系咱的可能回复会很慢quq。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/1X2KhMRQQ/">Linux 下 新网卡命名规则</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/_s76ovCDv/">[水]用python写一个爬虫，多线程自动下载本子并打成压缩包quq</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/bvpPm_q7g/">dalao们~~~（旧友链页面）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/VCrVnOiyQ/">nginx的配置文件原来是这么用的。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/ahML50iaz/">通过文件夹共享，给文件夹一个出盘符</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/CWgwFCiIn/">突然搭建一个Konachan一样的色图站</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/I715vqjVt/">使用百度TTS API获取合成一句话</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge warning">
+          杂谈
+        </a>
+      
+        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge success">
+          公告
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    <img src="https://count.getloli.com/get/@moeyukiblog?theme=gelbooru-h" alt="Moe Count" /><br><a href='https://show.lolipet.moe/'>初雪的朋友们</a> | <a class="rss" href="https://yuki.yuki233.com/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '349c8406e994852bfc66',
+        clientSecret: 'dbc4a7a453ba9d5de4c77e9ff1cc841fa465a43b',
+        repo: 'yuki.yuki233.com',
+        owner: 'hatsuyuki280',
+        admin: ['hatsuyuki280'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://yuki.yuki233.com</id>
     <title>某初雪的无名blog</title>
-    <updated>2021-05-28T07:16:05.519Z</updated>
+    <updated>2021-05-28T07:35:34.399Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://yuki.yuki233.com"/>
     <link rel="self" href="https://yuki.yuki233.com/atom.xml"/>
@@ -10,6 +10,13 @@
     <logo>https://yuki.yuki233.com/images/avatar.png</logo>
     <icon>https://yuki.yuki233.com/favicon.ico</icon>
     <rights>All rights reserved 2021, 某初雪的无名blog</rights>
+    <entry>
+        <title type="html"><![CDATA[姑且。。把以前的旧文章全部搬过来了。。。]]></title>
+        <id>https://yuki.yuki233.com/post/7Wiz9duyN/</id>
+        <link href="https://yuki.yuki233.com/post/7Wiz9duyN/">
+        </link>
+        <updated>2021-05-28T08:29:22.000Z</updated>
+    </entry>
     <entry>
         <title type="html"><![CDATA[【迁移成功】本站已成功从WordPress顺利迁移到了Gridea！]]></title>
         <id>https://yuki.yuki233.com/post/8mIx_8uO5/</id>
@@ -22,87 +29,94 @@
 ]]></content>
     </entry>
     <entry>
-        <title type="html"><![CDATA[本站迁移时遇到的诸多问题及对应的解决方案]]></title>
-        <id>https://yuki.yuki233.com/post/VVlVUALjd/</id>
-        <link href="https://yuki.yuki233.com/post/VVlVUALjd/">
+        <title type="html"><![CDATA[近期忙于重建blog，总之如果有各种问题需要联系咱的可能回复会很慢quq。。。]]></title>
+        <id>https://yuki.yuki233.com/post/D5wGkNdUI/</id>
+        <link href="https://yuki.yuki233.com/post/D5wGkNdUI/">
         </link>
-        <updated>2019-05-15T08:10:25.000Z</updated>
+        <updated>2021-01-21T08:28:29.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[如何在Linux上部署SMB服务]]></title>
-        <id>https://yuki.yuki233.com/post/LaGIS7D9T/</id>
-        <link href="https://yuki.yuki233.com/post/LaGIS7D9T/">
+        <title type="html"><![CDATA[Linux 下 新网卡命名规则]]></title>
+        <id>https://yuki.yuki233.com/post/1X2KhMRQQ/</id>
+        <link href="https://yuki.yuki233.com/post/1X2KhMRQQ/">
         </link>
-        <updated>2019-05-01T08:07:21.000Z</updated>
+        <updated>2020-09-23T08:28:03.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[MikroTik Cloud Router Switch的配置]]></title>
-        <id>https://yuki.yuki233.com/post/Dguep2QKR/</id>
-        <link href="https://yuki.yuki233.com/post/Dguep2QKR/">
+        <title type="html"><![CDATA[[水]用python写一个爬虫，多线程自动下载本子并打成压缩包quq]]></title>
+        <id>https://yuki.yuki233.com/post/_s76ovCDv/</id>
+        <link href="https://yuki.yuki233.com/post/_s76ovCDv/">
         </link>
-        <updated>2019-04-16T07:56:27.000Z</updated>
+        <updated>2020-09-16T08:27:05.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[好开心quq今天收到了第一封Github的issue~]]></title>
-        <id>https://yuki.yuki233.com/post/PeEMlVzN2/</id>
-        <link href="https://yuki.yuki233.com/post/PeEMlVzN2/">
+        <title type="html"><![CDATA[dalao们~~~（旧友链页面）]]></title>
+        <id>https://yuki.yuki233.com/post/bvpPm_q7g/</id>
+        <link href="https://yuki.yuki233.com/post/bvpPm_q7g/">
         </link>
-        <updated>2018-07-19T08:01:04.000Z</updated>
+        <updated>2020-08-20T08:25:46.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[7月摸鱼感言]]></title>
-        <id>https://yuki.yuki233.com/post/zzUxQ7XZs/</id>
-        <link href="https://yuki.yuki233.com/post/zzUxQ7XZs/">
+        <title type="html"><![CDATA[nginx的配置文件原来是这么用的。。。]]></title>
+        <id>https://yuki.yuki233.com/post/VCrVnOiyQ/</id>
+        <link href="https://yuki.yuki233.com/post/VCrVnOiyQ/">
         </link>
-        <updated>2018-07-11T08:48:56.000Z</updated>
+        <updated>2020-08-20T08:22:49.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[今天在乐山玩了一圈quq]]></title>
-        <id>https://yuki.yuki233.com/post/UJKNiYi4I/</id>
-        <link href="https://yuki.yuki233.com/post/UJKNiYi4I/">
+        <title type="html"><![CDATA[通过文件夹共享，给文件夹一个出盘符]]></title>
+        <id>https://yuki.yuki233.com/post/ahML50iaz/</id>
+        <link href="https://yuki.yuki233.com/post/ahML50iaz/">
         </link>
-        <updated>2018-05-28T08:53:31.000Z</updated>
+        <updated>2020-07-23T08:25:13.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[日语基础-适合初心者的日语基础知识的体系化整理-50音图]]></title>
-        <id>https://yuki.yuki233.com/post/ej1zVG4-3/</id>
-        <link href="https://yuki.yuki233.com/post/ej1zVG4-3/">
+        <title type="html"><![CDATA[突然搭建一个Konachan一样的色图站]]></title>
+        <id>https://yuki.yuki233.com/post/CWgwFCiIn/</id>
+        <link href="https://yuki.yuki233.com/post/CWgwFCiIn/">
         </link>
-        <updated>2018-05-28T08:42:26.000Z</updated>
+        <updated>2020-07-15T08:22:19.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[使用node js在Android手机上获取pixiv（P站）的每日top50]]></title>
-        <id>https://yuki.yuki233.com/post/6WNXsaHV6/</id>
-        <link href="https://yuki.yuki233.com/post/6WNXsaHV6/">
+        <title type="html"><![CDATA[使用百度TTS API获取合成一句话]]></title>
+        <id>https://yuki.yuki233.com/post/I715vqjVt/</id>
+        <link href="https://yuki.yuki233.com/post/I715vqjVt/">
         </link>
-        <updated>2018-05-27T08:50:01.000Z</updated>
+        <updated>2020-01-16T08:26:23.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[Android使用Tasker链接学校的WiFi——//虽然最终用的还是shell(未完待续)]]></title>
-        <id>https://yuki.yuki233.com/post/pu6OK_btj/</id>
-        <link href="https://yuki.yuki233.com/post/pu6OK_btj/">
+        <title type="html"><![CDATA[本次迁移过程中又踩了一堆坑quq。。。]]></title>
+        <id>https://yuki.yuki233.com/post/HZZgRWT2K/</id>
+        <link href="https://yuki.yuki233.com/post/HZZgRWT2K/">
         </link>
-        <updated>2018-05-19T09:02:57.000Z</updated>
+        <updated>2020-01-08T08:21:51.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[学校wifi认证好难受，自己写了个自动化quq]]></title>
-        <id>https://yuki.yuki233.com/post/i0FeAuMw1/</id>
-        <link href="https://yuki.yuki233.com/post/i0FeAuMw1/">
+        <title type="html"><![CDATA[又一次搬家完成quq。。]]></title>
+        <id>https://yuki.yuki233.com/post/YwCFRiJ2e/</id>
+        <link href="https://yuki.yuki233.com/post/YwCFRiJ2e/">
         </link>
-        <updated>2018-05-18T07:59:55.000Z</updated>
+        <updated>2020-01-02T08:21:16.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[使用 Cloudflare API 实现 DDns]]></title>
-        <id>https://yuki.yuki233.com/post/J34NTIegp/</id>
-        <link href="https://yuki.yuki233.com/post/J34NTIegp/">
+        <title type="html"><![CDATA[祝大家2020新年快乐呢quq]]></title>
+        <id>https://yuki.yuki233.com/post/1-5dCTnCf/</id>
+        <link href="https://yuki.yuki233.com/post/1-5dCTnCf/">
         </link>
-        <updated>2018-05-17T08:11:55.000Z</updated>
+        <updated>2020-01-01T08:23:13.000Z</updated>
     </entry>
     <entry>
-        <title type="html"><![CDATA[本站已支持多因素验证登陆]]></title>
-        <id>https://yuki.yuki233.com/post/SeuKiN8ia/</id>
-        <link href="https://yuki.yuki233.com/post/SeuKiN8ia/">
+        <title type="html"><![CDATA[使用twitter的API获取关注你的人的关注列表]]></title>
+        <id>https://yuki.yuki233.com/post/vF8jYyuWn/</id>
+        <link href="https://yuki.yuki233.com/post/vF8jYyuWn/">
         </link>
-        <updated>2018-01-28T06:43:22.000Z</updated>
+        <updated>2019-12-27T08:27:31.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Linux 下 find 命令的学习笔记]]></title>
+        <id>https://yuki.yuki233.com/post/Nu23ANx4O/</id>
+        <link href="https://yuki.yuki233.com/post/Nu23ANx4O/">
+        </link>
+        <updated>2019-09-19T08:20:51.000Z</updated>
     </entry>
 </feed>

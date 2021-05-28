@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>使用百度TTS API获取合成一句话 | 某初雪的无名blog</title>
+<meta name="description" content="在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://yuki.yuki233.com/favicon.ico?v=1622187106007">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://yuki.yuki233.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://yuki.yuki233.com">某初雪的无名blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>使用百度TTS API获取合成一句话</h1>
+            <p class="article-meta">
+              2020-01-16
+              
+            </p>
+            
+            <div class="post-content">
+              <p>[infobox title=&quot;前言&quot;]说白了就是之前有一次在某个群里帮人做了个视频，事后有人询问视频里那个可爱的声音是怎么做到的，（还莫名其妙被起了个叫什么‘萌萌萝莉音’的名字）于是拖了很久终于决定今天水一发教程好了。。。</p>
+<p>首先先说明下这个教程并没有直接读<a href="https://ai.baidu.com/tech/speech/tts" target="_blank" rel="noopener noreferrer">百度 tts api</a> 的 <a href="https://ai.baidu.com/ai-doc/SPEECH/yk38y8h3j" target="_blank" rel="noopener noreferrer">document</a> 来的有用，几乎可以理解为纯新手向教程，不涉及高级用法，纯粹只是一篇拿来水文章的文章。。。如果有任何云服务的 api 的使用经验的人应该都不需要阅读本文，另外本文也几乎不会做过多词语解释，最多也只会举几个伪代码和通过 shell script 的调用 api 获取音频文本的例子。[/infobox]</p>
+<p>[infobox title=&quot;为什么是百度&quot;]简单来说。。。没有原因。。。。纯粹因为百度 tts 有几个听起来比较可爱的语音库。。。仅此而已。。。[/infobox]</p>
+<p>[infobox title=&quot;事前准备&quot;]既然是百度 tts 。。。那么首先你需要一个百度账号，这个过程各位就自行注册吧。。。虽然咱觉得就算不是百度云服务的用户。。。至少应该也都是用过百度云的人。。。账号应该还是有的。。。</p>
+<p>通过百度的文档可以知道。。。调用 tts api 的话需要一堆 API key 啦。。。API secret 什么的。。。<a href="https://ai.baidu.com/ai-doc/SPEECH/jk38y8gno#step1%E6%88%90%E4%B8%BA%E7%99%BE%E5%BA%A6ai%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0%E7%9A%84%E5%BC%80%E5%8F%91%E8%80%85" target="_blank" rel="noopener noreferrer">如何获取需要的 key 和 secret 请直接阅读百度的这个页面</a></p>
+<p>然后就是使用环境了。。。除了伪代码外。。。shell 主要只使用 bash 和 curl，环境姑且是 debian 10。。。curl 的安装或者 debian 的安装不在本文涵盖范围。。。</p>
+<p>[/infobox]</p>
+<p>[infobox title=&quot;具体实现&quot;]首先通过阅读官方文档，我们可以知道 API key/API secret 并不是直接用来访问 TTS API 的，需要获得对应的 access_token 才可以。又根据官方文档中如何获得 access_token 的部分可知， access_token 可以通过 GET 方法从 https://openapi.baidu.com/oauth/2.0/token 处获得，需要3个参数，分别是grant_type（值固定为 client_credentials ），client_id（你的 API key ），client_secret（你的 API secret ）。</p>
+<p>综上所述可以通过访问<code>https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&amp;client_id=&amp;client_secret=</code>获取 access_token。</p>
+<p>如果参数正确，返回值将会是下面这个样子的：</p>
+<pre class="hl"><code class="json">{"access_token":"24.3c7de***-16949624",
+"session_key":"9mzdCKcjqot***ccjfgRQ==",
+"scope":"audio_voice_assistant_get brain_enhanced_asr audio_tts_post ***",
+"refresh_token":"25.f***-16949624",
+"session_secret":"b52***eb85",
+"expires_in":2592000}</code></pre>
+<p>如果不用写成完整的脚本的话。。。你大概可以选择直接手动复制需要的值并把那个值随便存到哪个变量里。。。但如果需要写成一个脚本又懒得上网 google bash 下如何处理 json 的话，后文 bash 的示例代码里随便举了一个本文正好能用的例子。</p>
+<p>接着阅读官方文档我们可以知道想要获取语音的话可以通过使用 POST 或者 GET 方法访问 https://tsn.baidu.com/text2audio。需要的参数参考下面的表格<br>
+[collapse title=&quot;被挤得变形了的表格&quot;]</p>
+<table style="height: 478px;" width="675">
+<tbody>
+<tr>
+<td style="text-align: center;">tex</td>
+<td style="text-align: left;">必填</td>
+<td style="text-align: left;">  合成的文本，使用UTF-8编码。小于2048个中文字或者英文数字。
+（文本在百度服务器内转换为GBK后，长度必须小于4096字节）</td>
+</tr>
+<tr>
+<td style="text-align: center;">tok</td>
+<td style="text-align: center;">必填</td>
+<td style="text-align: left;">  开放平台获取到的开发者access_token（见上面的“鉴权认证机制”段落）</td>
+</tr>
+<tr>
+<td style="text-align: center;">cuid</td>
+<td>必填</td>
+<td style="text-align: left;">  用户唯一标识，用来计算UV值。
+建议填写能区分用户的机器 MAC 地址或 IMEI 码，长度为60字符以内</td>
+</tr>
+<tr>
+<td style="text-align: center;">ctp</td>
+<td>必填</td>
+<td>  客户端类型选择，web端填写固定值1</td>
+</tr>
+<tr>
+<td style="text-align: center;">lan</td>
+<td>必填</td>
+<td>  固定值zh。语言选择,目前只有中英文混合模式，填写固定值zh</td>
+</tr>
+<tr>
+<td style="text-align: center;">spd</td>
+<td>选填</td>
+<td>  语速，取值0-15，默认为5中语速</td>
+</tr>
+<tr>
+<td style="text-align: center;">pit</td>
+<td>选填</td>
+<td>  音调，取值0-15，默认为5中语调</td>
+</tr>
+<tr>
+<td style="text-align: center;">vol</td>
+<td>选填</td>
+<td style="text-align: left;">  音量，取值0-15，默认为5中音量</td>
+</tr>
+<tr>
+<td style="text-align: center;">per
+基础音库</td>
+<td style="text-align: left;">选填</td>
+<td style="text-align: left;">  度小宇=1，度小美=0，度逍遥=3，度丫丫=4</td>
+</tr>
+<tr>
+<td style="text-align: center;">per
+精品音库</td>
+<td style="text-align: center;">选填</td>
+<td style="text-align: left;">  度博文=106，度小童=110，度小萌=111，度米朵=103，度小娇=5</td>
+</tr>
+<tr>
+<td style="text-align: center;">aue</td>
+<td style="text-align: left;">选填</td>
+<td style="text-align: left;">  3为mp3格式(默认)； 4为pcm-16k；5为pcm-8k；6为wav（内容同pcm-16k）;
+注意aue=4或者6是语音识别要求的格式，但是音频内容不是语音识别要求的
+自然人发音，所以识别效果会受影响。</td>
+</tr>
+</tbody>
+</table>
+[/collapse]
+<p>于是参考文档，最终可以通过https://tsn.baidu.com/text2audio?tex=&amp;lan=zh&amp;cuid=&amp;ctp=1&amp;tok= 获取想要的语音<br>
+[/infobox]</p>
+<p>[infobox title=&quot;伪代码实例&quot;]</p>
+<pre class="hl"><code class="bash">#! 伪代码
+创建变量 API_key，API_secret 并赋值
+创建变量 Token_URL ，值为'https://openapi.baidu.com/oauth/2.0/token'
+创建变量 TTS_API ， 值为'https://tsn.baidu.com/text2audio'
+创建变量 cuid ，随便给它赋个值
+
+# 获取 access_token
+使用 GET 方法访问 ${Token_URL}?grant_type=client_credentials&amp;client_id=${API_key}&amp;client_secret=${API_secret} 并将结果保存至 变量a
+使用什么方法从 变量a 中获取字段 access_token 并存入变量 access_token
+
+# 获取 文本 对应的 语音
+请求用户输入想要转换的文本，并将文本存入变量 Text
+使用 GET 方法访问 ${TTS_API}?tok=${access_token}&amp;lan=zh&amp;cuid=${cuid}&amp;ctp=1&amp;tex=${Text} ，并将返回内容保存至${Text}.mp3</code></pre>
+<p>[/infobox]</p>
+<p>[infobox title=&quot;具体一点写成shell脚本的话长这样&quot;]</p>
+<pre class="hl"><code class="bash">#!/bin/bash
+# 设置 API_key，API_secret 和 cuid
+API_key=""
+API_secret=""
+cuid=""
+
+#后面代码中会用到的两个请求地址
+Token_URL="https://openapi.baidu.com/oauth/2.0/token"
+TTS_API="https://tsn.baidu.com/text2audio"
+
+# 获取 access_token
+a=$(wget "$Token_URL?grant_type=client_credentials&amp;client_id=$API_key&amp;client_secret=$API_secret" -O-)
+# 使用 Google 到的方法对返回值的 json 进行处理并获取返回值中的 access_token
+access_token=$(echo $a | sed s/'[,:]'/\\n/g | grep 'access_token' -A1 | tail -1 | sed s/'"'//g)
+
+# 获取 文本 对应的 语音
+read -p "请输入想要转换的文本：" Text
+w $TTS_API?tok=$access_token&amp;lan=zh&amp;cuid=$cuid&amp;ctp=1&amp;tex=$Text -o $Text.mp3
+</code></pre>
+<p>[/infobox]</p>
+<p>[infobox title=&quot;总结&quot;]只是调用百度提供的 API 进行 TTS 而已，通常来说应该没什么技术上的难度，不过既然有人想知道是怎么实现的。。咱还是姑且丢了一份示例代码出来。。。因为说实话咱也不知道该怎么详细介绍如何通过百度提供的 API 进行 TTS 。。。。总之只能希望咱的这篇水出来的blog能对一些人有帮助吧（说实话咱感觉这篇文章写的还没有百度自己的文档详细呢。。。）</p>
+<p>咱之前使用的语音库没记错应该是 4 号，感兴趣的话可以把 per=4 附加进请求里试试呢[/infobox]</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://yuki.yuki233.com/post/HZZgRWT2K/">
+                <h3 class="post-title">
+                  本次迁移过程中又踩了一堆坑quq。。。
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+          
+            <div class="paper" data-aos="fade-in">
+              <div id="gitalk-container"></div>
+            </div>
+          
+
+          
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://yuki.yuki233.com/images/avatar.png?v=1622187106007" class="no-responsive avatar">
+    <div class="text-muted">在日留学生 | 日语学习中 | 学生党 | 吃土日常 | 喜欢猫猫但是没有养 | 什么都不会的菜鸡 | 喜欢可爱的小萝莉 | 三分钟热度 | 喜欢废萌向动漫</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/hatsuyuki280" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/yuki233dayo" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/7Wiz9duyN/">姑且。。把以前的旧文章全部搬过来了。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/8mIx_8uO5/">【迁移成功】本站已成功从WordPress顺利迁移到了Gridea！</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/D5wGkNdUI/">近期忙于重建blog，总之如果有各种问题需要联系咱的可能回复会很慢quq。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/1X2KhMRQQ/">Linux 下 新网卡命名规则</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/_s76ovCDv/">[水]用python写一个爬虫，多线程自动下载本子并打成压缩包quq</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/bvpPm_q7g/">dalao们~~~（旧友链页面）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/VCrVnOiyQ/">nginx的配置文件原来是这么用的。。。</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/ahML50iaz/">通过文件夹共享，给文件夹一个出盘符</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/CWgwFCiIn/">突然搭建一个Konachan一样的色图站</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://yuki.yuki233.com/post/I715vqjVt/">使用百度TTS API获取合成一句话</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://yuki.yuki233.com/tag/za-tan/" class="badge secondary">
+          杂谈
+        </a>
+      
+        <a href="https://yuki.yuki233.com/tag/gong-gao/" class="badge success">
+          公告
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    <img src="https://count.getloli.com/get/@moeyukiblog?theme=gelbooru-h" alt="Moe Count" /><br><a href='https://show.lolipet.moe/'>初雪的朋友们</a> | <a class="rss" href="https://yuki.yuki233.com/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '349c8406e994852bfc66',
+        clientSecret: 'dbc4a7a453ba9d5de4c77e9ff1cc841fa465a43b',
+        repo: 'yuki.yuki233.com',
+        owner: 'hatsuyuki280',
+        admin: ['hatsuyuki280'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
